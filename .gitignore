@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+mobile/google-services.json
+mobile/GoogleService-Info.plist
+
 # Expo
 .expo/
 dist/
