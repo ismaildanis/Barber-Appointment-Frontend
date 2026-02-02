@@ -6,6 +6,7 @@ import { useUnifiedMe } from "@/src/hooks/useUnifiedAuth";
 import { LinearGradient } from "expo-linear-gradient";
 import { Asset } from "expo-asset";
 
+
 SplashScreen.preventAutoHideAsync();
 
 const ANIMATION_CONFIG = {
@@ -22,7 +23,6 @@ export default function Index() {
   const router = useRouter();
   const nav = useRootNavigationState();
   const { data, isLoading, isError } = useUnifiedMe();
-
   const [canNavigate, setCanNavigate] = useState(false);
   const [splashHidden, setSplashHidden] = useState(false);
 

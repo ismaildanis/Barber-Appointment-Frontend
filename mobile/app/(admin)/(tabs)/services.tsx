@@ -16,6 +16,7 @@ import {
   useDeleteService,
   useUploadImage,
   useDeleteImage,
+  useGetServicesForAdmin,
 } from "@/src/hooks/useServiceQuery";
 import { Service } from "@/src/types/service";
 import Spinner from "@/components/ui/Spinner";
@@ -34,7 +35,7 @@ type FormValues = {
 };
 
 export default function ServicesScreen() {
-  const { data: services, isLoading, isRefetching, refetch } = useGetServices();
+  const { data: services, isLoading, isRefetching, refetch } = useGetServicesForAdmin();
   const createService = useCreateService();
   const deleteService = useDeleteService();
   const [editingId, setEditingId] = useState<number | null>(null);

@@ -3,23 +3,20 @@ import Hours from "@/components/appointments/Hours";
 import Space from "@/components/appointments/Space";
 import Spinner from "@/components/ui/Spinner";
 import { myColors } from "@/constants/theme";
-
 import { FontAwesome5  } from "@expo/vector-icons";
-
 import { useAvailableDatesForAppointment, useAvailableHoursForAppointment, useCreateAppointment } from "@/src/hooks/useAppointmentQuery";
 import { useGetBarbers } from "@/src/hooks/useBarberQuery";
 import { useGetServices } from "@/src/hooks/useServiceQuery";
-import { useUnifiedMe } from "@/src/hooks/useUnifiedAuth";
 import { useBarberStore } from "@/src/store/barberStore";
 import { useServiceStore } from "@/src/store/serviceStore";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Button, RefreshControl, TouchableOpacity, ScrollView, Text, ImageBackground, Image, View, TextInput, useWindowDimensions } from "react-native";
+import { RefreshControl, TouchableOpacity, ScrollView, Text, ImageBackground, Image, View, TextInput, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppointmentSummary from "@/components/appointments/AppointmentSummary";
 import { AlertModal } from "@/components/ui/AlertModal";
-import { createAppointmentsIndexColors } from "@/constants/theme/createAppt";
+import { useShopStore } from "@/src/store/useShopStore";
 
 type AlertMode = "confirm" | "info-success" | "info-error";
 
@@ -31,14 +28,18 @@ export default function CreateAppointments() {
   
   const [selectedDate, setSelectedDate] = useState<string>();
   const [selectedHour, setSelectedHour] = useState<string>();
+  const { activeShopSlug } = useShopStore();
 
   const safeBarberId = barberId ?? undefined;
 
-  const { data: services, isLoading: sLoading, refetch: refetchServices } = useGetServices();
-  const { data: barbers, isLoading: bLoading, refetch: refetchBarbers } = useGetBarbers();
+  const { data: services, isLoading: sLoading, refetch: refetchServices } = useGetServices(activeShopSlug ?? ""); 
+  const { data: barbers, isLoading: bLoading, refetch: refetchBarbers } = useGetBarbers(activeShopSlug ?? "");
+
   const { data: availableDates, isLoading: adLoading, refetch: refetchAvailableDates } = useAvailableDatesForAppointment();
   const { data: availableHours, isLoading: ahLoading, refetch: refetchAvailableHours } = useAvailableHoursForAppointment(safeBarberId, selectedDate);
+
   const createAppointment = useCreateAppointment();
+
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMode, setAlertMode] = useState<AlertMode>("info-success");
   const [alertTitle, setAlertTitle] = useState("");
@@ -65,7 +66,7 @@ export default function CreateAppointments() {
 
   const onSelect = () => {
     setSelectedHour(undefined);
-    router.push("/(customer)/create-appointments/select-service")
+    router.push(`/(customer)/${activeShopSlug}/create-appointments/select-service`);
   }
 
   const onClick = () => {
@@ -142,7 +143,7 @@ export default function CreateAppointments() {
           resizeMode="contain"
         >
           <TouchableOpacity
-            onPress={() => router.push("/(customer)/create-appointments/select-barber")}
+            onPress={() => router.push(`/(customer)/${activeShopSlug}/create-appointments/select-barber`)}
             activeOpacity={0.9}
             style={{
               position: 'absolute',

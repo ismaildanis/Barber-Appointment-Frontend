@@ -6,8 +6,19 @@ const key = ["service"] as const;
 
 export const useGetServices = (slug: string) => 
     useQuery({
-        queryKey: key,
+        queryKey: [key, slug], 
         queryFn: () => serviceApi.getServices(slug),
+        gcTime: 30 * 60 * 1000,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchOnWindowFocus: false,
+        enabled: !!slug
+    });
+
+export const useGetServicesForAdmin = () => 
+    useQuery({
+        queryKey: key,
+        queryFn: () => serviceApi.getServicesForAdmin(),
         gcTime: 30 * 60 * 1000,
         refetchOnMount: false,
         refetchOnReconnect: false,

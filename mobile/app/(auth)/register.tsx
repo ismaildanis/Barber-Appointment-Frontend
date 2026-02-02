@@ -30,10 +30,19 @@ export default function Register() {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMsg, setAlertMsg] = useState("");
 
+  const nameHandler = (value: string) => {
+      return value
+      .trim()
+      .toLocaleLowerCase('tr-TR')
+      .replace(/^./, c => c.toLocaleUpperCase('tr-TR'));
+  }
+
   const onSubmit = handleSubmit((values) => {
     register.mutate(
     {
       ...values,
+      firstName: nameHandler(values.firstName),
+      lastName: nameHandler(values.lastName),
       phone: values.phone?.trim() ? values.phone.trim() : null,
     },
     {

@@ -36,7 +36,7 @@ export default function CustomerTabLayout () {
         }}
         >
             <Tabs.Screen
-            name="home"
+            name="[slug]/home"
             options={{
                 title: "Ana Sayfa",
                 tabBarIcon: () => <TabIcon iosName="house.fill" androidName="home" />,
@@ -44,7 +44,7 @@ export default function CustomerTabLayout () {
             />
 
             <Tabs.Screen
-            name="create-appointments"
+            name="[slug]/create-appointments"
             options={{
                 title: "Randevu Oluştur",
                 tabBarIcon: () =>

@@ -7,10 +7,9 @@ import { myColors } from "@/constants/theme";
 
 type ShopHeaderProps = {
   customer: Customer;
-  logout: () => void;
 };
 
-export default function ShopHeader({ customer, logout }: ShopHeaderProps) {
+export default function ShopHeader({ customer }: ShopHeaderProps) {
   const router = useRouter();
   const { width } = useWindowDimensions();
   

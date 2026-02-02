@@ -6,8 +6,20 @@ const key = ['barber'] as const
 
 export const useGetBarbers = (slug: string) => 
     useQuery({ 
-        queryKey: [key],
+        queryKey: [key, slug],
         queryFn: () => barberApi.getBarbers(slug), 
+        staleTime: 5 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchOnWindowFocus: false,
+        enabled: !!slug
+    });
+
+export const useGetBarbersForAdmin = () => 
+    useQuery({ 
+        queryKey: [key],
+        queryFn: () => barberApi.getBarbersForAdmin(), 
         staleTime: 5 * 60 * 1000,
         gcTime: 30 * 60 * 1000,
         refetchOnMount: false,

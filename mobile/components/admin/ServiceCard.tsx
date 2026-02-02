@@ -11,7 +11,7 @@ type Props = {
 export function ServiceCard({ item, onEdit, onDelete }: Props) {
   return (
     <View style={styles.card}>
-      {item.image ? <Image source={{ uri: item.image }} style={styles.image} /> : null}
+      {item.image ? <Image source={{ uri: item.image, cache: "force-cache" }} style={styles.image} /> : null}
 
       <View style={styles.content}>
         <Text style={styles.name}>{item.name}</Text>

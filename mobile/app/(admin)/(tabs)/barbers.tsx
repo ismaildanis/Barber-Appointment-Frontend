@@ -17,19 +17,19 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import {
-  useGetBarbers,
   useCreateBarber,
   useUpdateActivityBarberr,
   useDeleteBarber,
   useBarberUploadImage,
   useBarberDeleteImage,
+  useGetBarbersForAdmin,
 } from "@/src/hooks/useBarberQuery";
 import { Barber } from "@/src/types/barber";
 import Spinner from "@/components/ui/Spinner";
 import { myColors } from "@/constants/theme";
 
 export default function BarbersScreen() {
-  const { data: barbers, isLoading, isRefetching, refetch } = useGetBarbers();
+  const { data: barbers, isLoading, isRefetching, refetch } = useGetBarbersForAdmin();
 
   const createBarber = useCreateBarber();
   const [editingId, setEditingId] = useState<number | null>(null);

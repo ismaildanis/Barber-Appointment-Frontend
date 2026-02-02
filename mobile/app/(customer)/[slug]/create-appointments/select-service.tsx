@@ -2,7 +2,7 @@ import Services from "@/components/appointments/Service";
 import { useGetServices } from "@/src/hooks/useServiceQuery";
 import { useHourStore } from "@/src/store/hourStore";
 import { useServiceStore } from "@/src/store/serviceStore";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef } from "react";
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,7 +10,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SelectService() {
     const router = useRouter();
-    const { data: services, isLoading, refetch, error } = useGetServices();
+    const { slug } =  useLocalSearchParams<{ slug: string }>();
+    const { data: services, isLoading, refetch, error } = useGetServices(slug);
     const { serviceIds, setServiceIds, toggleService } = useServiceStore();
     const hideIdsRef = useRef<number[]>(serviceIds);
 
