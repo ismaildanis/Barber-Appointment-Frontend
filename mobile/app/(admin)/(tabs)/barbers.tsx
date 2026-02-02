@@ -12,7 +12,8 @@ import {
   Modal,
   Switch,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  RefreshControl
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -259,6 +260,7 @@ export default function BarbersScreen() {
         keyExtractor={(item) => String(item.id)}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="people-outline" size={64} color="rgba(255,255,255,0.2)" />

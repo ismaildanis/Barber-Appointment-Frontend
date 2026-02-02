@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -225,7 +226,7 @@ export default function ServicesScreen() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Servis ara..."
-          placeholderTextColor="rgba(255,255,255,0.4)"
+          placeholderTextColor="rgba(255,255,255,0.4)" 
           style={styles.searchInput}
         />
         {searchQuery.length > 0 && (
@@ -242,6 +243,7 @@ export default function ServicesScreen() {
           <ServiceCard item={item} onEdit={startEdit} onDelete={onDelete} />
         )}
         contentContainerStyle={styles.listContent}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="cut-outline" size={64} color="rgba(255,255,255,0.2)" />

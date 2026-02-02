@@ -87,7 +87,7 @@ export default function SelectShopModal({
                                                                 <Image
                                                                     source={{ uri: shop.image }}
                                                                     style={styles.shopImage}
-                                                                    contentFit="cover"
+                                                                    contentFit="contain"
                                                                 />
                                                             ) : (
                                                                 <LinearGradient
@@ -155,7 +155,6 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0, 0, 0, 0.75)",
         justifyContent: "center",
         alignItems: "center",
-        padding: 16,
     },
 
     modalContainer: {
@@ -174,7 +173,7 @@ const styles = StyleSheet.create({
     },
 
     gradientWrapper: {
-        padding: 20,
+        padding: 16,
     },
 
     header: {
@@ -229,7 +228,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         padding: 12,
         gap: 14,
-        minHeight: 100,
+        minHeight: 86,
     },
 
     shopImageWrapper: {
@@ -243,33 +242,34 @@ const styles = StyleSheet.create({
     },
 
     shopImage: {
-        width: 80,
-        height: 80,
+        backgroundColor: "#ffffffd7",
+        width: 64,
+        height: 64,
         borderRadius: 12,
     },
 
     shopImagePlaceholder: {
-        width: 80,
-        height: 80,
-        borderRadius: 12,
-        justifyContent: "center",
-        alignItems: "center",
+        width: 64,
+        height: 64,
+        borderRadius: 10,
+        justifyContent: "center",  
+        alignItems: "center",    
     },
 
     placeholderText: {
-        fontSize: 32,
+        fontSize: 24,
         fontWeight: "800",
         color: "#1A1A1A",
     },
 
     rightSection: {
         flex: 1,
-        gap: 4,
+        gap: 2,
         justifyContent: "center",
     },
 
     shopName: {
-        fontSize: 17,
+        fontSize: 16,
         fontWeight: "700",
         color: "#FFFFFF",
         letterSpacing: 0.2,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     },
 
     locationText: {
-        fontSize: 14,
+        fontSize: 13,
         color: "#D9C9A3",
         fontWeight: "600",
     },

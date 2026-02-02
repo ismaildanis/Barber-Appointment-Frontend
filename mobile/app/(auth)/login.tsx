@@ -217,20 +217,33 @@ export default function LoginScreen() {
                   control={control}
                   name="password"
                   render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Sifre"
-                      placeholderTextColor={"#4e4e4e"}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      secureTextEntry
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      textContentType="password"
-                    />
+                    <View style={styles.passwordWrapper}>
+                      <TextInput
+                        style={styles.passwordInputFixed}
+                        placeholder="Sifre"
+                        placeholderTextColor={"#4e4e4e"}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        secureTextEntry={!showPassword}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        textContentType="password"
+                      />
+                      <TouchableOpacity
+                        style={styles.eyeButtonFixed}
+                        onPress={() => setShowPassword(!showPassword)}
+                      >
+                        <Ionicons
+                          name={showPassword ? "eye-off-outline" : "eye-outline"}
+                          size={22}
+                          color="#888"
+                        />
+                      </TouchableOpacity>
+                    </View>
                   )}
                 />
+                
 
                 <View style={{ flexDirection: "column", alignItems: "flex-end", justifyContent: "center" }}>
                   <TouchableOpacity onPress={() => router.replace("/forgot")}>
@@ -320,5 +333,33 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     maxWidth: 420,
     gap: 12,
+  },
+  passwordWrapper: {
+    position: "relative",
+    width: "100%",
+  },
+
+  passwordInputFixed: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+    paddingVertical: 14,
+    paddingLeft: 14,
+    paddingRight: 48,   // 👈 GÖZ için yer
+    borderRadius: 12,
+    backgroundColor: "#1f1f1f",
+    fontSize: 16,
+    color: "#fff",
+  },
+
+  eyeButtonFixed: {
+    position: "absolute",
+    right: 12,
+    top: "50%",
+    transform: [{ translateY: -11 }], // iconSize(22) / 2
+    height: 22,
+    width: 22,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

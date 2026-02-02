@@ -38,7 +38,7 @@ export default function ShopHeader({ shops }: ShopHeaderProps) {
                 <Image
                   source={{ uri: selectedShop.image }}
                   style={styles.shopImage}
-                  contentFit="cover"
+                  contentFit="contain"
                 />
               ) : (
                 <LinearGradient
@@ -52,14 +52,13 @@ export default function ShopHeader({ shops }: ShopHeaderProps) {
                   </Text>
                 </LinearGradient>
               )}
-              
               <View style={styles.shopTextContainer}>
                 <Text style={styles.shopName} numberOfLines={1}>
                   {selectedShop?.name ?? "İşletme Seç"}
                 </Text>
                 {selectedShop && (
                   <Text style={styles.shopLocation} numberOfLines={1}>
-                    {selectedShop.district}, {selectedShop.city}
+                    {selectedShop.district}, {selectedShop.city}, {selectedShop.neighborhood} Mah.
                   </Text>
                 )}
               </View>
@@ -70,7 +69,7 @@ export default function ShopHeader({ shops }: ShopHeaderProps) {
                 color="#E4D2AC" 
                 style={styles.chevron}
               />
-            </View>
+              </View>
           </TouchableOpacity>
 
           {/* Profile Button */}
@@ -120,6 +119,9 @@ const styles = StyleSheet.create({
 
   shopSelector: {
     flex: 1,
+    flexDirection: "row",
+    gap: 12,
+    alignItems: "center"
   },
 
   shopDisplay: {
@@ -129,9 +131,11 @@ const styles = StyleSheet.create({
   },
 
   shopImage: {
+    backgroundColor: "#ffffffd7",
     width: 48,
     height: 48,
     borderRadius: 12,
+    alignSelf: "center",
   },
 
   shopImagePlaceholder: {
@@ -149,7 +153,6 @@ const styles = StyleSheet.create({
   },
 
   shopTextContainer: {
-    flex: 1,
     gap: 2,
   },
 
@@ -166,7 +169,7 @@ const styles = StyleSheet.create({
   },
 
   chevron: {
-    marginLeft: 4,
+    marginLeft: 2,
   },
 
   profileButton: {
