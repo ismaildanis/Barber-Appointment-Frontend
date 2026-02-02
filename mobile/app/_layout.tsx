@@ -1,11 +1,10 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { SplashScreen, Stack, useRouter } from 'expo-router';
+import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import 'react-native-reanimated';
 import * as Notifications from "expo-notifications";
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useEffect } from 'react';
 
 SplashScreen.preventAutoHideAsync();
 

@@ -4,10 +4,10 @@ import { ActivityBarber, CreateBarber, UpdateBarber } from '../types/barber';
 
 const key = ['barber'] as const
 
-export const useGetBarbers = () => 
+export const useGetBarbers = (slug: string) => 
     useQuery({ 
         queryKey: [key],
-        queryFn: () => barberApi.getBarbers(), 
+        queryFn: () => barberApi.getBarbers(slug), 
         staleTime: 5 * 60 * 1000,
         gcTime: 30 * 60 * 1000,
         refetchOnMount: false,
@@ -15,10 +15,10 @@ export const useGetBarbers = () =>
         refetchOnWindowFocus: false,
     });
 
-export const useGetBarber = (id: number) => 
+export const useGetBarber = (id: number, slug: string) => 
     useQuery({ 
         queryKey: [key, id], 
-        queryFn: () => barberApi.getBarber(id), 
+        queryFn: () => barberApi.getBarber(id, slug), 
         enabled: !!id 
     });
 

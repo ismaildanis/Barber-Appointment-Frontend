@@ -1,5 +1,6 @@
 export interface Barber {
     id: number;
+    shopId: number
     firstName: string;
     lastName: string;
     email: string;

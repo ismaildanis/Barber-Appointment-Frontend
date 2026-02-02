@@ -39,6 +39,7 @@ export interface Appointment {
     id: number;
     customerId?: number | null;
     barberId: number;
+    shopId: number;
     appointmentStartAt: string;
     appointmentEndAt: string;
     status: Status;
@@ -55,6 +56,7 @@ export interface AdminAppointment {
     id: number;
     customerId?: number | null;
     barberId: number;
+    shopId: number;
     appointmentStartAt: string;
     appointmentEndAt: string;
     status: Status;
@@ -72,6 +74,7 @@ export interface BarberAppointment {
     id: number;
     customerId?: number | null;
     barberId: number;
+    shopId: number;
     appointmentStartAt: string;
     appointmentEndAt: string;
     status: Status;

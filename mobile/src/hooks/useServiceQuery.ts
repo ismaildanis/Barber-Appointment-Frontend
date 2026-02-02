@@ -4,10 +4,10 @@ import { CreateService, UpdateService } from "../types/service";
 
 const key = ["service"] as const;
 
-export const useGetServices = () => 
+export const useGetServices = (slug: string) => 
     useQuery({
         queryKey: key,
-        queryFn: () => serviceApi.getServices(),
+        queryFn: () => serviceApi.getServices(slug),
         gcTime: 30 * 60 * 1000,
         refetchOnMount: false,
         refetchOnReconnect: false,

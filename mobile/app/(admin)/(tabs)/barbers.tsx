@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
   title: { fontSize: 28, fontWeight: "800", color: "#fff", letterSpacing: 0.5 },
   subtitle: { fontSize: 14, color: "rgba(255,255,255,0.6)", marginTop: 4 },
-  addButton: { width: 48, height: 48, borderRadius: 24, backgroundColor: "#D1C4B2", alignItems: "center", justifyContent: "center", shadowColor: "#E4D2AC", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 },
+  addButton: { width: 48, height: 48, borderRadius: 24, backgroundColor: "#D1C4B2", alignItems: "center", justifyContent: "center" },
   searchContainer: { flexDirection: "row", alignItems: "center", backgroundColor: "#121212", borderRadius: 12, paddingHorizontal: 12, marginBottom: 16, borderWidth: 1, borderColor: "rgba(255,255,255,0.08)" },
   searchInput: { flex: 1, color: "#fff", fontSize: 15, paddingVertical: 12, paddingHorizontal: 8 },
   listContent: { paddingBottom: 20 },
