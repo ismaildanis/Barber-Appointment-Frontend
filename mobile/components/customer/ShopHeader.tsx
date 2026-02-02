@@ -1,92 +1,175 @@
-import { StyleSheet, useWindowDimensions, View, Text, TouchableOpacity, Platform } from "react-native";
-import { Customer } from "@/src/types/customerAuth";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { myColors, themeColors } from "@/constants/theme";
+import { Shop } from "@/src/types/shop";
+import { useState } from "react";
+import { useShopStore } from "@/src/store/useShopStore";
+
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { myColors } from "@/constants/theme";
+import SelectShopModal from "../shops/SelectShopModal";
 
 type ShopHeaderProps = {
-  customer: Customer;
+  shops: Shop[] | undefined;
 };
 
-export default function ShopHeader({ customer }: ShopHeaderProps) {
+export default function ShopHeader({ shops }: ShopHeaderProps) {
   const router = useRouter();
-  const { width } = useWindowDimensions();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { activeShopSlug, setActiveShop } = useShopStore();
   
-  const isTablet = width >= 768;
-  
-  const headerHeight = isTablet ? 100 : Math.min(Math.max(width * 0.28, 80), 150);
-  
-  const padH = isTablet ? 24 : Math.min(Math.max(width * 0.05, 16), 24);
-  const padV = isTablet ? 16 : padH * 0.7;
-  
-  const nameSize = isTablet ? 18 : Math.min(Math.max(width * 0.04, 12), 16) + 3;
-  const emailSize = isTablet ? 14 : Math.min(Math.max(width * 0.04, 12), 14);
-  
-  const avatarSize = isTablet ? 56 : 52;
-  
-  const initials = `${customer.firstName?.[0] ?? "B"}${customer.lastName?.[0] ?? ""}`.toUpperCase();
+  const selectedShop = activeShopSlug 
+    ? shops?.find(s => s.slug === activeShopSlug) 
+    : null;
 
   return (
-    <View style={[styles.wrapper, { height: headerHeight }]}>
-      <View
-        style={[
-          styles.container,
-          {
-            paddingHorizontal: padH,
-            paddingVertical: padV,
-          },
-        ]}
-      >
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 12 }}>
-            <LinearGradient 
-              colors={myColors.mainBackgroundGradient2}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }} 
-              style={[styles.avatar, { width: avatarSize, height: avatarSize, borderRadius: avatarSize / 2 }]}
-            >
-              <Text style={styles.avatarText}>{initials}</Text>
-            </LinearGradient>
-            <View style={{ gap: 2 }}>
-              <Text style={[styles.name, { fontSize: nameSize }]}>
-                {customer.firstName ?? "Kullanıcı"} {customer.lastName ?? ""}
-              </Text>
-              <Text style={[styles.email, { fontSize: emailSize }]}>{customer.email}</Text>
+    <View style={styles.wrapper}>
+      <View style={styles.container}>
+        <View style={styles.content}>
+          {/* Shop Selector */}
+          <TouchableOpacity
+            style={styles.shopSelector}
+            onPress={() => setIsModalOpen(true)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.shopDisplay}>
+              {selectedShop?.image ? (
+                <Image
+                  source={{ uri: selectedShop.image }}
+                  style={styles.shopImage}
+                  contentFit="cover"
+                />
+              ) : (
+                <LinearGradient
+                  colors={["#C8AA7A", "#E4D2AC"]}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={styles.shopImagePlaceholder}
+                >
+                  <Text style={styles.placeholderText}>
+                    {selectedShop?.name?.[0]?.toUpperCase() ?? "?"}
+                  </Text>
+                </LinearGradient>
+              )}
+              
+              <View style={styles.shopTextContainer}>
+                <Text style={styles.shopName} numberOfLines={1}>
+                  {selectedShop?.name ?? "İşletme Seç"}
+                </Text>
+                {selectedShop && (
+                  <Text style={styles.shopLocation} numberOfLines={1}>
+                    {selectedShop.district}, {selectedShop.city}
+                  </Text>
+                )}
+              </View>
+
+              <Ionicons 
+                name="chevron-down" 
+                size={20} 
+                color="#E4D2AC" 
+                style={styles.chevron}
+              />
             </View>
-          </View>
-          
-          <TouchableOpacity onPress={() => router.push("/profile")}>
-            <Ionicons
-              name="person"
-              size={24}
-              color="#E4D2AC"
-              style={{ marginLeft: 10 }}
-            /> 
+          </TouchableOpacity>
+
+          {/* Profile Button */}
+          <TouchableOpacity 
+            onPress={() => router.push("/profile")}
+            style={styles.profileButton}
+          >
+            <Ionicons name="person" size={24} color="#E4D2AC" />
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Shop Selection Modal */}
+      <SelectShopModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="İşletme Seç"
+        shops={shops ?? []}
+        selectedShop={selectedShop ?? undefined}
+        onSelectShop={setActiveShop}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: { backgroundColor: "transparent", overflow: "hidden" },
-  container: { 
-    flex: 1, 
-    flexDirection: "column", 
-    backgroundColor: "transparent", 
-    justifyContent: "center", 
-    borderBottomColor: '#E4D2AC', 
-    borderBottomWidth: 2, 
+  wrapper: {
+    backgroundColor: "transparent",
+    overflow: "hidden",
+  },
+
+  container: {
+    backgroundColor: "transparent",
+    borderBottomColor: '#E4D2AC',
+    borderBottomWidth: 2,
     shadowOpacity: 0.45,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  logoRow: { alignItems: "center", justifyContent: "center" },
-  name: { fontWeight: "600", color: "#fff" },
-  email: { color: "#c0c2bdff", fontWeight: "500" },
-  avatar: {
+
+  content: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    gap: 12,
   },
-  avatarText: { color: "#1A1A1A", fontWeight: "800", fontSize: 18 },
+
+  shopSelector: {
+    flex: 1,
+  },
+
+  shopDisplay: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  shopImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+  },
+
+  shopImagePlaceholder: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  placeholderText: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#1A1A1A",
+  },
+
+  shopTextContainer: {
+    flex: 1,
+    gap: 2,
+  },
+
+  shopName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+
+  shopLocation: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#D0D0D0",
+  },
+
+  chevron: {
+    marginLeft: 4,
+  },
+
+  profileButton: {
+    padding: 8,
+  },
 });

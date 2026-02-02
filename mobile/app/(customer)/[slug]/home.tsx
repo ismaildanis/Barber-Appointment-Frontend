@@ -64,13 +64,14 @@ export default function CustomerHome() {
       style={{ flex: 1, backgroundColor: myColors.mainBackground }}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <ShopHeader customer={me} />
+        <ShopHeader shops={shops} />
 
         <FlatList
           data={["spacer"]}
           keyExtractor={(item) => item}
           renderItem={() => null}
           contentContainerStyle={{ paddingBottom: 120 }}
+          showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}
           ListHeaderComponent={
             loading ? (
