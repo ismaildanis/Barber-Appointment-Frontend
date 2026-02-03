@@ -98,24 +98,32 @@ export default function Settings() {
 
   const pickImage = async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) return;
-
+      if (!perm.granted) {
+        Alert.alert("Uyarı", "Galeri izni verilmedi");
+        return;
+      }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
       quality: 0.8,
-    });
-
+    })
     if (result.canceled) return;
 
     const asset = result.assets[0];
     const formData = new FormData();
-    formData.append("file", {
-      uri: asset.uri,
-      name: `shop-${Date.now()}.jpg`,
-      type: "image/jpeg",
-    } as any);
+      formData.append("file", {
+        uri: asset.uri,
+        name: `shop-${Date.now()}.jpg`,
+        type: "image/jpeg",
+      } as any);
 
-    uploadImage.mutate(formData, { onSuccess: refetch });
+      uploadImage.mutate(formData, {
+        onSuccess: () => Alert.alert("Başarılı", "Resim Yüklendi"),
+        onError: (err: any) => {
+          console.log(err)
+          Alert.alert("Hata", err?.response?.data?.message || "Yüklenemedi");
+        },
+      });
   };
 
   return (
