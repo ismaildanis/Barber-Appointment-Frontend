@@ -50,13 +50,6 @@ export default function BarbersScreen() {
   const [imageUri, setImageUri] = useState<string | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const isWorking =
-    createBarber.isPending ||
-    updateActivity.isPending ||
-    deleteBarber.isPending ||
-    uploadImage.isPending ||
-    deleteImage.isPending ||
-    isRefetching;
 
   const resetForm = () => {
     setFirstName("");
@@ -221,8 +214,6 @@ export default function BarbersScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {isWorking && <Spinner />}
-
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Berberler</Text>
