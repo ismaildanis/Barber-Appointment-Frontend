@@ -53,7 +53,6 @@ export default function AppointmentDetail() {
       minute: withTime ? "2-digit" : undefined,
     });
   };
-  console.log("Appointment Data:", services);
   const startFull = data.appointmentStartAt.slice(11, 16).replace("T", " ");
   const endOnly = data.appointmentEndAt?.slice(11, 16);
   const fullDate = data.appointmentStartAt.slice(0, 10);

@@ -1,3 +1,4 @@
+
 export interface Barber {
     id: number;
     shopId: number
@@ -8,6 +9,7 @@ export interface Barber {
     active: boolean
     image?: string
 }
+
 export interface CreateBarber {
     firstName: string;
     lastName: string;

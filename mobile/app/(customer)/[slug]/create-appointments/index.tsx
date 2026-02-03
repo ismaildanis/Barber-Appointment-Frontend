@@ -31,13 +31,11 @@ export default function CreateAppointments() {
   const { activeShopSlug } = useShopStore();
 
   const safeBarberId = barberId ?? undefined;
-
   const { data: services, isLoading: sLoading, refetch: refetchServices } = useGetServices(activeShopSlug ?? ""); 
   const { data: barbers, isLoading: bLoading, refetch: refetchBarbers } = useGetBarbers(activeShopSlug ?? "");
 
   const { data: availableDates, isLoading: adLoading, refetch: refetchAvailableDates } = useAvailableDatesForAppointment();
   const { data: availableHours, isLoading: ahLoading, refetch: refetchAvailableHours } = useAvailableHoursForAppointment(safeBarberId, selectedDate);
-
   const createAppointment = useCreateAppointment();
 
   const [alertVisible, setAlertVisible] = useState(false);
@@ -124,7 +122,6 @@ export default function CreateAppointments() {
     ...others.slice(0, 1), 
   ];
   const remaining = others.length - 1;
-
   const onSelectDate = (date: string) => {
     setSelectedHour(undefined);
     setSelectedDate(date);
