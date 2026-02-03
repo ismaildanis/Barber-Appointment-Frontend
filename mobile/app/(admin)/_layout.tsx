@@ -79,6 +79,28 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         onPress={() => props.navigation.navigate("holiday")}
       />
 
+      <DrawerItem
+        label="İşletme Ayarları"
+        icon={({ color, size }) => (
+          <Ionicons name="settings" color={color} size={size} />
+        )}
+        labelStyle={{ 
+          color: themeColors.textSecondary, 
+          fontWeight: "600",
+          fontSize: 15,
+        }}
+        style={{ 
+          marginHorizontal: 12, 
+          borderRadius: 12,
+          backgroundColor: themeColors.surface,
+          marginBottom: 8,
+        }}
+        inactiveTintColor={themeColors.textSecondary}
+        activeBackgroundColor={themeColors.primary}
+        activeTintColor={themeColors.textOnPrimary}
+        onPress={() => props.navigation.navigate("settings")}
+      />
+
       <View
         style={{
           height: 1,

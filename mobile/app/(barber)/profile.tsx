@@ -92,7 +92,7 @@ export default function BarberProfile() {
   };
 
   const onRemoveImage = () => {
-    Alert.alert("Resmi Kaldır", "Servis resmini kaldırmak istediğinizden emin misiniz?", [
+    Alert.alert("Resmi Kaldır", "Berber resmini kaldırmak istediğinizden emin misiniz?", [
       { text: "Vazgeç", style: "cancel" },
       {
         text: "Kaldır",

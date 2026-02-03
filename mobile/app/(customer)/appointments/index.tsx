@@ -179,6 +179,7 @@ export default function CustomerAppointments() {
                     İptal sebebi: {item.cancelReason || "Belirtilmedi"}
                   </Text>
                 )}
+                <Text style={styles.meta}>İşletme: {item.shop?.name || "Bilinmiyor"}</Text>
                 <Text style={styles.meta}>Hizmetler: {services}</Text>
                 {item.notes && <Text style={styles.note}>Not: {item.notes}</Text>}
               </View>

@@ -93,7 +93,7 @@ export default function LoginScreen() {
               end={{ x: 1, y: 0.5 }}
               style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
             >
-              <Image source={require("@/assets/logo/logoForeground.png")} style={styles.logo} />
+              <Image source={require("@/assets/logo/logoForeground.png")} style={styles.logo} contentFit="contain" />
             </LinearGradient>
           }
         >
@@ -186,7 +186,7 @@ export default function LoginScreen() {
               end={{ x: 1, y: 0.5 }}
               style={{ height: 220, alignItems: "center", justifyContent: "center" }}
             >
-              <Image source={require("@/assets/logo/logoForeground.png")} style={styles.logo} />
+              <Image source={require("@/assets/logo/logoForeground.png")} style={styles.logo} contentFit="contain" />
             </LinearGradient>
 
             <View style={[styles.container, { flexGrow: 1, backgroundColor: "#121212" }]}>
@@ -287,7 +287,6 @@ const styles = StyleSheet.create({
   logo: {
     width: "100%",
     height: "100%",
-    resizeMode: "center",
   },
   title: {
     fontSize: 26,

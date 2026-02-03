@@ -34,7 +34,7 @@ export default function ShopHeader({ shops }: ShopHeaderProps) {
             activeOpacity={0.7}
           >
             <View style={styles.shopDisplay}>
-              {selectedShop?.image ? (
+              {selectedShop?.image && selectedShop.image !== null && selectedShop.image !== undefined ? (
                 <Image
                   source={{ uri: selectedShop.image }}
                   style={styles.shopImage}
@@ -131,7 +131,6 @@ const styles = StyleSheet.create({
   },
 
   shopImage: {
-    backgroundColor: "#ffffffd7",
     width: 48,
     height: 48,
     borderRadius: 12,

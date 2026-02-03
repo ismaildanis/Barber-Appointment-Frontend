@@ -1,5 +1,5 @@
 export interface Shop {
-    id: string;
+    id: number;
     name: string;
     slug: string;
     phone?: string | null;
@@ -10,4 +10,13 @@ export interface Shop {
     address: string;
     image?: string;
     active: boolean;
+}
+
+export interface UpdateShop {
+    name?: string;
+    phone?: string | null;
+    city?: string;
+    district?: string;
+    neighborhood?: string;
+    address?: string;
 }
