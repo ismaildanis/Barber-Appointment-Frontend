@@ -32,11 +32,11 @@ import { todayAppointmentsColors } from "@/constants/theme/barber/todayAppt";
 type CardProps = { item: BarberAppointment };
 
 const BarberAppointmentCard = ({ item }: CardProps) => {
-    const router = useRouter();
+  const router = useRouter();
   const start = item.appointmentStartAt?.slice(11, 16);
   const end = item.appointmentEndAt?.slice(11, 16);
   const services =
-    item.appointmentServices?.map((s: AppointmentService) => s.service?.name).join(", ") ||
+    item.appointmentServices?.map((s: AppointmentService) => s?.name).join(", ") ??
     "Hizmet bilgisi yok";
   const statusBg = statusColor[item.status] || "#a3a3a3";
 

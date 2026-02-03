@@ -50,6 +50,7 @@ export interface Appointment {
     cancelledAt?: string | null; 
     barber?: Barber | null;
     appointmentServices?: AppointmentService[] | null;
+    shop?: ShopAppt;
 }
 
 export interface AdminAppointment {
@@ -102,9 +103,15 @@ export interface Service {
 
 export interface AppointmentService {
     id: number;
-    appointmentId: number;
     serviceId: number;
-    service: Service;
+    name: string;
+    price: string;
+    duration: number;
+}
+
+export interface ShopAppt {
+    id: number;
+    name: string;
 }
 
 export interface CreateAppointmentRequest {

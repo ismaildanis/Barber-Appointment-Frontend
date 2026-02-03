@@ -1,7 +1,7 @@
 import { useGetCustomerAppointments } from "@/src/hooks/useAppointmentQuery";
 import { AppointmentService, Appointment, statusLabel, statusColor, AppointmentRange, rangeLabels } from "@/src/types/appointment";
 import Spinner from "@/components/ui/Spinner";
-import { FlatList, View, Text, StyleSheet, TouchableOpacity, RefreshControl } from "react-native";
+import { FlatList, View, Text, StyleSheet, TouchableOpacity, RefreshControl, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
@@ -28,11 +28,6 @@ export default function CustomerAppointments() {
     }
   }, [isError, retryCount, selectedRange]);
 
-  const handleRetry = () => {
-    setRetryCount(prev => prev + 1);
-    refetch();
-  };
-
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -48,25 +43,17 @@ export default function CustomerAppointments() {
     return (
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>Randevularım</Text>
-        <View style={styles.emptyContainer}>
-          <View style={styles.emptyIconContainer}>
-            <Ionicons name="alert-circle-outline" size={40} color="#ff6b6b" />
-          </View>
-          <Text style={styles.emptyTitle}>Bir Hata Oluştu</Text>
-          <Text style={styles.emptyDescription}>
-            Randevularınız yüklenirken bir sorun oluştu. Lütfen tekrar deneyin.
-          </Text>
-          <TouchableOpacity
-            style={styles.retryButton}
-            onPress={handleRetry}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="refresh" size={18} color="#1E1E1E" />
-            <Text style={styles.retryButtonText}>
-              Yeniden Dene {retryCount > 0 && `(${retryCount}/3)`}
+        <ScrollView  refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}>
+          <View style={styles.emptyContainer}>
+            <View style={styles.emptyIconContainer}>
+              <Ionicons name="alert-circle-outline" size={40} color="#ff6b6b" />
+            </View>
+            <Text style={styles.emptyTitle}>Bir Hata Oluştu</Text>
+            <Text style={styles.emptyDescription}>
+              Randevularınız yüklenirken bir sorun oluştu. Lütfen sayfayı yenileyiniz.
             </Text>
-          </TouchableOpacity>
-        </View>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -163,7 +150,7 @@ export default function CustomerAppointments() {
           const end = item.appointmentEndAt?.slice(11, 16);
           const services =
             item.appointmentServices
-              ?.map((s: AppointmentService) => s.service?.name)
+              ?.map((s: AppointmentService) => s?.name)
               .join(", ") || "—";
 
           return (
@@ -251,6 +238,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 40,
+    marginTop: 80,
   },
   emptyIconContainer: {
     width: 80,

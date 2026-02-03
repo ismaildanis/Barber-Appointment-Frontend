@@ -52,6 +52,10 @@ export default function CreateAppointments() {
   }, [barbers]);
 
   useEffect(() => {
+    setBarberId(null);
+  }, [activeShopSlug]);
+
+  useEffect(() => {
     if (!selectedDate && availableDates?.length) {
       setSelectedDate(availableDates[0]);
     }
@@ -135,6 +139,7 @@ export default function CreateAppointments() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#121212" }}>
+     
       {/* Hero foto */}
       <View style={{ height: height * 0.3, width: '100%' }}>
         <ImageBackground 

@@ -20,7 +20,8 @@ export default function LastAppointmentCard({ lastAppt, loading }: Props) {
 
   const barberName = `${lastAppt.barber?.firstName ?? ""} ${lastAppt.barber?.lastName ?? ""}`.trim();
   const firstService = lastAppt.appointmentServices?.[0];
-  const serviceName = firstService?.service?.name ?? "Hizmet";
+  const serviceName = firstService?.name ?? "Hizmet";
+  const shopName = lastAppt.shop?.name ?? "İşletme";
   const dateLabel = formatDate(lastAppt.appointmentStartAt);
   const initials = getInitials(lastAppt.barber?.firstName, lastAppt.barber?.lastName);
 
@@ -48,6 +49,7 @@ export default function LastAppointmentCard({ lastAppt, loading }: Props) {
           <View style={styles.info}>
             <Text style={styles.title} numberOfLines={1}>{barberName}</Text>
             <Text style={styles.meta} numberOfLines={1}>{serviceName}</Text>
+            <Text style={styles.meta} numberOfLines={1}>{shopName}</Text>
             <Text style={styles.meta}>{dateLabel}</Text>
           </View>
 

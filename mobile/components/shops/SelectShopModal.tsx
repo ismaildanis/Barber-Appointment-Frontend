@@ -1,4 +1,4 @@
-import { themeColors, myColors } from "@/constants/theme";
+import { myColors } from "@/constants/theme";
 import { Shop } from "@/src/types/shop";
 import { Image } from "expo-image";
 import { Modal, Pressable, Text, TouchableOpacity, View, ScrollView, StyleSheet } from "react-native";
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         overflow: "hidden",
         borderWidth: 1.5,
-        borderColor: "rgba(228, 210, 172, 0.3)",
+        borderColor: "#121212",
     },
 
     gradientWrapper: {
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         overflow: "hidden",
         borderWidth: 1,
-        borderColor: "rgba(255, 255, 255, 0.08)",
+        borderColor: "#121212)",
     },
 
     shopItem: {
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     shopImageWrapper: {
         borderRadius: 12,
         overflow: "hidden",
-        shadowColor: "#000",
+        shadowColor: "#1e1e1e",
         shadowOpacity: 0.2,
         shadowRadius: 6,
         shadowOffset: { width: 0, height: 2 },

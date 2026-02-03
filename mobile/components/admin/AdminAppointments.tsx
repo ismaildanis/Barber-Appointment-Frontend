@@ -157,7 +157,7 @@ export default function AdminAppointments({
           const end = item.appointmentEndAt?.slice(11, 16);
           const services =
             item.appointmentServices
-              ?.map((s: AppointmentService) => s.service?.name)
+              ?.map((s: AppointmentService) => s.name)
               .join(", ") || "—";
 
           return (

@@ -34,7 +34,7 @@ export default function TodayAppointmentCard({ todayAppointments, loading }: Tod
         {todayAppointments!.map((item) => {
             const timeRange = `${item.appointmentStartAt?.slice(11, 16)} - ${item.appointmentEndAt?.slice(11, 16)}`;
             const services =
-              item.appointmentServices?.map((s: AppointmentService) => s.service?.name).join(", ") || "Hizmet bilgisi yok";
+              item.appointmentServices?.map((s: AppointmentService) => s?.name).join(", ") || "Hizmet bilgisi yok";
 
             return (
               <TouchableOpacity

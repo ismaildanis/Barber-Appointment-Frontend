@@ -1,9 +1,8 @@
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { myColors, themeColors } from "@/constants/theme";
 import { Shop } from "@/src/types/shop";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useShopStore } from "@/src/store/useShopStore";
 
 import { Image } from "expo-image";
@@ -18,6 +17,7 @@ export default function ShopHeader({ shops }: ShopHeaderProps) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { activeShopSlug, setActiveShop } = useShopStore();
+
   
   const selectedShop = activeShopSlug 
     ? shops?.find(s => s.slug === activeShopSlug) 

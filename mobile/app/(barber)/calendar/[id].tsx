@@ -1,5 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, KeyboardAvoidingView, Platform, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Spinner from "@/components/ui/Spinner";
 import { useCancelBarberAppointment, useGetBarberOneAppointment, useMarkCompletedBarber, useMarkNoShowBarber } from "@/src/hooks/useAppointmentQuery";
 import { statusLabel, statusColor, AppointmentService } from "@/src/types/appointment";
@@ -12,16 +13,14 @@ export default function CalendarDetails() {
   const router = useRouter();
   const [reasonOpen, setReasonOpen] = useState(false);
   const [reason, setReason] = useState("");
-  const { data, isLoading, isError, refetch } = useGetBarberOneAppointment(apptId);
+  const { data, isLoading, isError, refetch, isRefetching } = useGetBarberOneAppointment(apptId);
   const cancelMutation = useCancelBarberAppointment(apptId);
   const completedMutation = useMarkCompletedBarber();
   const noShowMutation = useMarkNoShowBarber();
 
-  if (isLoading) return (
-    <View style={styles.container}>
-      <Spinner size="large" />
-    </View>
-  );
+  const isWorking = isRefetching || cancelMutation.isPending || completedMutation.isPending || noShowMutation.isPending;
+
+  if (isLoading) return <Spinner />;
 
   if (isError || !data) return (
     <View style={styles.container}>
@@ -32,12 +31,14 @@ export default function CalendarDetails() {
     </View>
   );
 
-  const services =
-    data.appointmentServices?.map((s: AppointmentService) => s.service?.name).join(", ") ||
-    "Hizmet bilgisi yok";
-  const start = data.appointmentStartAt?.slice(0, 16).replace("T", " ");
+  const date = data.appointmentStartAt?.slice(0, 10);
+  const start = data.appointmentStartAt?.slice(11, 16).replace("T", " ");
   const end = data.appointmentEndAt?.slice(11, 16);
-  const badgeColor = statusColor[data.status] || "#a3a3a3";
+  const totalPrice = data.appointmentServices?.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
+  const customer = data.customer ? `${data.customer.firstName} ${data.customer.lastName}` : "Silinmiş Hesap";
+  const customerContact = data.customer?.phone || "—";
+  const customerContact2 = data.customer?.email || "—";
+  const canAct = data.status === "SCHEDULED" || data.status === "EXPIRED";
 
   const handleMarkCompleted = () => {
     Alert.alert(
@@ -48,15 +49,16 @@ export default function CalendarDetails() {
         { text: "Evet", onPress: markCompletedConfirmed },
       ]
     );
-  }
+  };
 
   const markCompletedConfirmed = () => {
-    completedMutation.mutate(apptId, { onSuccess: () => {
-      router.replace("/(barber)/calendar");
-      refetch();
-    }});
+    completedMutation.mutate(apptId, {
+      onSuccess: () => {
+        Alert.alert("Başarılı", "Randevu tamamlandı olarak işaretlendi.");
+        refetch();
+      },
+    });
   };
-      
 
   const handleMarkNoShow = () => {
     Alert.alert(
@@ -68,191 +70,411 @@ export default function CalendarDetails() {
       ]
     );
   };
-      
-  const markNoShowConfirmed = () => {
-    noShowMutation.mutate(apptId, { onSuccess: () => {
-      router.replace("/(barber)/calendar");
-      refetch();
-    }});
-  }
 
+  const markNoShowConfirmed = () => {
+    noShowMutation.mutate(apptId, {
+      onSuccess: () => {
+        Alert.alert("Başarılı", "Randevu gelinmedi olarak işaretlendi.");
+        refetch();
+      },
+    });
+  };
+
+  const handleMarkCancel = () => {
+    Alert.alert(
+      "Randevuyu İptal Et",
+      "Bu işlemi yapmak istediğinize emin misiniz?",
+      [
+        { text: "İptal", style: "cancel" },
+        { text: "Evet", onPress: markCancelConfirmed },
+      ]
+    );
+  };
+
+  const markCancelConfirmed = () => {
+    const payload = reason.trim() ? { cancelReason: reason.trim() } : {};
+    cancelMutation.mutate(payload, {
+      onSuccess: () => {
+        Alert.alert("Başarılı", "Randevu iptal edildi.");
+        setReason("");
+        refetch();
+      },
+    });
+  };
 
   return (
-    <View style={styles.container}>
-     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 24 }}>       
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.replace("/(barber)/calendar")}>
-          <Ionicons name="arrow-back" size={20} color="#fff" />
-          <Text style={{ color: "#fff", fontSize: 16 }}>Randevular</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView contentContainerStyle={{ gap: 16, paddingTop: 6 }}>
-        <Text style={styles.title}>Randevu Detayı</Text>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <SafeAreaView style={styles.container}>
+        {isWorking && <Spinner />}
 
-        <View style={styles.heroCard}>
-          <View style={styles.rowBetween}>
-            <Text style={styles.time}>{start}{end ? ` - ${end}` : ""}</Text>
-            <View style={[styles.badge, { backgroundColor: badgeColor }]}>
-              <Text style={styles.badgeText}>{statusLabel[data.status] || data.status}</Text>
-            </View>
-          </View>
-          <Text style={styles.bigName} numberOfLines={1}>
-            {`${data?.customer?.firstName ?? "Silinmiş"} ${data?.customer?.lastName ?? "Hesap"}`}
-          </Text>
-          <Text style={styles.meta}>Telefon: {data?.customer?.phone ?? "—"}</Text>
-          <Text style={styles.meta}>Email: {data?.customer?.email ?? "—"}</Text>
-          <Text style={styles.meta}>Hizmetler: {services}</Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.label}>Notlar</Text>
-          <Text style={styles.value}>{data.notes || "—"}</Text>
-          {data.cancelReason ? (
-            <>
-              <Text style={styles.label}>İptal Sebebi:</Text>
-              <Text style={styles.note}>{data.cancelReason}</Text>
-            </>
-          ) : null}
-        </View>
-
-          {data.status === "SCHEDULED" && (
-            <TouchableOpacity
-              onPress={() => setReasonOpen(true)}
-              style={[styles.btnDanger, cancelMutation.isPending && { opacity: 0.7 }]}
-              disabled={cancelMutation.isPending}
-            >
-              <Text style={styles.btnTextCancel}>
-                Randevuyu İptal Et
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          {data.status === "SCHEDULED" && (
-            <TouchableOpacity
-              onPress={() => handleMarkCompleted()}
-              style={[styles.btnCompleted, completedMutation.isPending && { opacity: 0.7 }]}
-              disabled={completedMutation.isPending}
-            >
-              <Text style={styles.btnTextCompleted}>
-                Randevuyu Tamamlandı Olarak işaretle
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          {data.status === "SCHEDULED" && (
-            <TouchableOpacity
-              onPress={() => handleMarkNoShow()}
-              style={[styles.btnNoShow, noShowMutation.isPending && { opacity: 0.7 }]}
-              disabled={noShowMutation.isPending}
-            >
-              <Text style={styles.btnTextNoShow}>
-                Randevuya gelinmedi olarak işaretle
-              </Text>
-            </TouchableOpacity>
-          )}
-        <Modal transparent visible={reasonOpen} animationType="slide" onRequestClose={() => setReasonOpen(false)}>
-          <KeyboardAvoidingView
-            style={{ flex: 1, justifyContent: "flex-end" }}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Back Button */}
+          <TouchableOpacity 
+            onPress={() => router.replace("/(barber)/calendar")} 
+            style={styles.backBtn}
           >
-          <View style={styles.overlay}>
-            <View style={styles.modal}>
-              <Text style={styles.modalTitle}>İptal Sebebi</Text>
-              <TextInput
-                style={styles.modalInput}
-                placeholder="Sebep yazın (Opsiyonel)..."
-                placeholderTextColor="#6b7280"
-                value={reason}
-                onChangeText={setReason}
-                multiline
-              />
-              <View style={styles.modalActions}>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => setReasonOpen(false)}>
-                  <Text style={styles.cancelText}>Vazgeç</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.confirmBtn}
-                  onPress={() => {
-                    const payload = reason.trim() ? { cancelReason: reason.trim() } : {};
+            <Ionicons name="arrow-back" size={22} color="#fff" />
+          </TouchableOpacity>
 
-                    cancelMutation.mutate(payload, {
-                      onSuccess: () => {
-                        setReason("");
-                        setReasonOpen(false);
-                        router.replace("/(barber)/calendar");
-                        refetch();
-                      },
-                    });
-                  }}
-                >
-                  <Text style={styles.confirmText}>
-                    {cancelMutation.isPending ? "İptal ediliyor..." : "İptal Et"}
-                  </Text>
-                </TouchableOpacity>
+          {/* Title */}
+          <Text style={styles.title}>Randevu Detayı</Text>
+
+          {/* Main Info Card */}
+          <View style={styles.card}>
+            <View style={styles.row}>
+              <Text style={styles.label}>Durum</Text>
+              <View style={[styles.statusBadge, { backgroundColor: statusColor[data.status] || "#888" }]}>
+                <Text style={styles.statusText}>{statusLabel[data.status] || data.status}</Text>
               </View>
             </View>
           </View>
-          </KeyboardAvoidingView>
-        </Modal>
-      </ScrollView>
-    </View>
+
+          {/* Customer Card */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Müşteri Bilgileri</Text>
+            
+            <View style={styles.row}>
+              <Text style={styles.label}>Ad Soyad</Text>
+              <Text style={styles.value}>{customer}</Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Telefon</Text>
+              <Text style={styles.value}>{customerContact}</Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Email</Text>
+              <Text style={styles.value}>{customerContact2}</Text>
+            </View>
+          </View>
+
+          {/* Date & Time Card */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Tarih ve Saat</Text>
+            
+            <View style={styles.row}>
+              <Text style={styles.label}>Tarih</Text>
+              <Text style={styles.value}>{date}</Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Saat</Text>
+              <Text style={styles.value}>{start} - {end || "—"}</Text>
+            </View>
+          </View>
+
+          {/* Services Card */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Hizmetler</Text>
+
+            {data.appointmentServices?.map((s: any, index: number) => (
+              <View key={index} style={styles.serviceRow}>
+                <Text style={styles.serviceName}>{s?.name || "—"}</Text>
+                <View style={styles.serviceRight}>
+                  <Text style={styles.servicePrice}>₺{s?.price || "0"}</Text>
+                  <Text style={styles.serviceDuration}>{s?.duration || "0"} dk</Text>
+                </View>
+              </View>
+            ))}
+
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Toplam</Text>
+              <Text style={styles.totalPrice}>₺{totalPrice?.toFixed(2) || "0.00"}</Text>
+            </View>
+          </View>
+
+          {/* Notes Card */}
+          {data.notes && (
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Not</Text>
+              <Text style={styles.noteText}>{data.notes}</Text>
+            </View>
+          )}
+
+          {/* Cancel Reason Card */}
+          {data.cancelReason && (
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>İptal Sebebi</Text>
+              <Text style={styles.cancelReasonText}>{data.cancelReason}</Text>
+            </View>
+          )}
+
+          {/* Action Buttons */}
+          <View style={styles.actions}>
+            <ActionButton
+              label="Tamamlandı"
+              onPress={handleMarkCompleted}
+              disabled={!canAct}
+            />
+            <ActionButton
+              label="Gelinmedi"
+              onPress={handleMarkNoShow}
+              disabled={!canAct}
+            />
+          </View>
+
+          {/* Cancel Section */}
+          <View style={styles.cancelBox}>
+            <Text style={styles.cardTitle}>Randevu İptali</Text>
+            {canAct && (
+              <TextInput
+                value={reason}
+                onChangeText={setReason}
+                placeholder="İptal sebebi yazın (Opsiyonel)..."
+                placeholderTextColor="#666"
+                style={styles.input}
+                multiline
+                numberOfLines={3}
+              />
+            )}
+            <ActionButton
+              label="İptal Et"
+              onPress={() => {
+                if (!canAct) return;
+                handleMarkCancel();
+              }}
+              disabled={!canAct}
+              danger
+            />
+          </View>
+          
+        </ScrollView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
+  );
+}
+
+function ActionButton({
+  label,
+  onPress,
+  disabled,
+  danger,
+}: {
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled}
+      style={[
+        styles.actionBtn,
+        danger ? styles.actionBtnDanger : null,
+        disabled ? styles.actionBtnDisabled : null,
+      ]}
+    >
+      <Text style={styles.actionText}>{label}</Text>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 18, backgroundColor: "#0f0f0f", paddingBottom: 100 },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#0f0f0f",
+  },
+
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 100,
+    gap: 14,
+  },
+
   backBtn: {
-      flexDirection: "row",
-      padding: 12,
-      borderRadius: 18,
-      backgroundColor: "rgba(255,255,255,0.08)",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 12,
-      marginTop: 12,
-      gap: 12
-  },
-  title: { fontSize: 24, fontWeight: "800", color: "#fff", marginBottom: 4 },
-  heroCard: {
-    padding: 18,
-    borderRadius: 18,
+    padding: 12,
+    borderRadius: 12,
     backgroundColor: "rgba(255,255,255,0.08)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
-    gap: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "flex-start",
   },
+
+  title: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#fff",
+    marginBottom: 6,
+  },
+
+  // Card
   card: {
     padding: 16,
     borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: "rgba(255,255,255,0.04)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.08)",
-    gap: 10,
+    gap: 12,
   },
-  rowBetween: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  time: { fontSize: 18, fontWeight: "800", color: "#fff" },
-  bigName: { fontSize: 20, fontWeight: "800", color: "#fff" },
-  badge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 },
-  badgeText: { color: "#0f0f0f", fontWeight: "800", fontSize: 12 },
-  label: { fontSize: 13, color: "rgba(255,255,255,0.7)" },
-  value: { fontSize: 15, fontWeight: "700", color: "#e5e7eb" },
-  meta: { fontSize: 14, color: "rgba(255,255,255,0.9)" },
-  note: { fontSize: 13, color: "#fbbf24" },
-  btnDanger: { marginTop: 6, padding: 16, borderRadius: 16, backgroundColor: "#1e1e1e", borderColor: "#ef4444", borderWidth: 1 },
-  btnCompleted: { marginTop: 6, padding: 16, borderRadius: 16, backgroundColor: "#1e1e1e", borderColor: "#E4D2AC", borderWidth: 1 },
-  btnNoShow: { marginTop: 6, padding: 16, borderRadius: 16, backgroundColor: "#1e1e1e", borderColor: "#a855f7", borderWidth: 1 },
-  btnTextNoShow: { color: "#a855f7", fontWeight: "800", textAlign: "center" },
-  btnTextCancel: { color: "#ef4444", fontWeight: "800", textAlign: "center" },
-  btnTextCompleted: { color: "#E4D2AC", fontWeight: "800", textAlign: "center" },
-  empty: { color: "#ccc" },
-  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" },
-  modal: { backgroundColor: "#1a1a1a", padding: 16, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
-  modalTitle: { color: "#fff", fontSize: 16, fontWeight: "700", marginBottom: 8 },
-  modalInput: { backgroundColor: "#111", color: "#fff", borderRadius: 10, padding: 12, minHeight: 80 },
-  modalActions: { flexDirection: "row", gap: 10, marginTop: 12 },
-  cancelBtn: { flex: 1, padding: 12, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.08)" },
-  confirmBtn: { flex: 1, padding: 12, borderRadius: 10, backgroundColor: "#ef4444" },
-  cancelText: { color: "#fff", textAlign: "center", fontWeight: "700" },
-  confirmText: { color: "#fff", textAlign: "center", fontWeight: "700" },
 
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#fff",
+    marginBottom: 4,
+  },
+
+  // Row
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#888",
+  },
+
+  value: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#fff",
+    textAlign: "right",
+  },
+
+  // Status
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+
+  statusText: {
+    color: "#0f0f0f",
+    fontWeight: "800",
+    fontSize: 12,
+  },
+
+  // Services
+  serviceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 6,
+  },
+
+  serviceName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#fff",
+    flex: 1,
+  },
+
+  serviceRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  servicePrice: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#fff",
+  },
+
+  serviceDuration: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "#888",
+  },
+
+  totalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 12,
+    marginTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.1)",
+  },
+
+  totalLabel: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#fff",
+  },
+
+  totalPrice: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#fff",
+  },
+
+  // Notes
+  noteText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#ccc",
+    lineHeight: 20,
+  },
+
+  cancelReasonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#ff9999",
+    lineHeight: 20,
+  },
+
+  // Actions
+  actions: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 6,
+  },
+
+  actionBtn: {
+    flex: 1,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  actionBtnDanger: {
+    backgroundColor: "#ef4444",
+  },
+
+  actionBtnDisabled: {
+    opacity: 0.3,
+  },
+
+  actionText: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+
+  // Cancel Box
+  cancelBox: {
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.04)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+    gap: 12,
+  },
+
+  input: {
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+    borderRadius: 12,
+    padding: 12,
+    color: "#fff",
+    backgroundColor: "rgba(0,0,0,0.3)",
+    fontSize: 14,
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+
+  empty: {
+    color: "#ccc",
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 50,
+  },
 });

@@ -23,7 +23,8 @@ export default function ScheduledAppointment({ scheduledAppt, loading }: Props) 
 
   const barberName = `${scheduledAppt.barber?.firstName ?? ""} ${scheduledAppt.barber?.lastName ?? ""}`.trim();
   const firstService = scheduledAppt.appointmentServices?.[0];
-  const serviceName = firstService?.service?.name ?? "Hizmet";
+  const serviceName = firstService?.name ?? "Hizmet";
+  const shopName = scheduledAppt.shop?.name ?? "İşletme";
   const dateLabel = formatDate(scheduledAppt.appointmentStartAt);
   const initials = getInitials(scheduledAppt.barber?.firstName, scheduledAppt.barber?.lastName);
 
@@ -59,6 +60,9 @@ export default function ScheduledAppointment({ scheduledAppt, loading }: Props) 
                 </Text>
                 <Text style={styles.meta} numberOfLines={1}>
                   {serviceName}
+                </Text>
+                <Text style={styles.meta} numberOfLines={1}>
+                  {shopName}
                 </Text>
                 <Text style={styles.meta}>{dateLabel}</Text>
               </View>
