@@ -14,7 +14,7 @@
     "production": {
       "autoIncrement": false,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://barber-appointment-system-app-production.up.railway.app/api"
+        "EXPO_PUBLIC_API_URL": "https://barber-appointment-backend-production.up.railway.app/api"
       }
     }
   },

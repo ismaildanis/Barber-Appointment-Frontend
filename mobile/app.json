@@ -15,7 +15,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.berberrandevum.mobile",
-      "buildNumber": "10",
+      "buildNumber": "11",
       "supportsTablet": true,
       "splash": {
         "image": "./assets/logo/splash-minimal.png",
@@ -29,7 +29,7 @@
     },
     "android": {
       "package": "com.berberrandevum.mobile",
-      "versionCode": 2,
+      "versionCode": 3,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundImage": "./assets/logo/AndroidArkaplan.png",
@@ -79,9 +79,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "435c485b-f0d0-4d97-aa76-666400925558"
+        "projectId": "f4f71061-1c41-4c46-9d48-6fb84495a1cd"
       }
     },
-    "owner": "ismail4573"
+    "owner": "ismail100"
   }
 }
