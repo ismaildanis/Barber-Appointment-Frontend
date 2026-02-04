@@ -15,7 +15,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.berberrandevum.mobile",
-      "buildNumber": "11",
+      "buildNumber": "12",
       "supportsTablet": true,
       "splash": {
         "image": "./assets/logo/splash-minimal.png",
@@ -29,7 +29,7 @@
     },
     "android": {
       "package": "com.berberrandevum.mobile",
-      "versionCode": 3,
+      "versionCode": 4,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundImage": "./assets/logo/AndroidArkaplan.png",
