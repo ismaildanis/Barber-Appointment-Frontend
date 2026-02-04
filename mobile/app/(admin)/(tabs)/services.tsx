@@ -204,7 +204,10 @@ export default function ServicesScreen() {
     [services, searchQuery]
   );
 
-  if (isLoading) return <Spinner />;
+
+  if (isLoading && services === null ) {
+    return <Spinner />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>

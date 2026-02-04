@@ -37,8 +37,6 @@ export default function BarbersScreen() {
 
   const updateActivity = useUpdateActivityBarberr(editingId || 0);
   const deleteBarber = useDeleteBarber();
-  const uploadImage = useBarberUploadImage();
-  const deleteImage = useBarberDeleteImage();
 
   const [showFormModal, setShowFormModal] = useState(false);
   const [firstName, setFirstName] = useState("");
@@ -210,7 +208,9 @@ export default function BarbersScreen() {
     );
   };
 
-  if (isLoading) return <Spinner />;
+  if (isLoading && barbers === null ) {
+    return <Spinner />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>

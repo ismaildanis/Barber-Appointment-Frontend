@@ -8,6 +8,7 @@ export const useGetServices = (slug: string) =>
     useQuery({
         queryKey: [key, slug], 
         queryFn: () => serviceApi.getServices(slug),
+        staleTime: 5 * 60 * 1000,
         gcTime: 30 * 60 * 1000,
         refetchOnMount: false,
         refetchOnReconnect: false,

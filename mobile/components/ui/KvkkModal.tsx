@@ -5,10 +5,16 @@ import {
   TouchableOpacity, 
   ScrollView, 
   Modal,
-  ActivityIndicator 
+  ActivityIndicator,
+  Platform,
+  Dimensions,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+
+const { width, height } = Dimensions.get('window');
+const isSmallDevice = width < 375;
 
 type Props = {
   visible: boolean;
@@ -19,6 +25,7 @@ type Props = {
 export function KvkkModal({ visible, onAccept, isAccepting }: Props) {
   const [checked, setChecked] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
+  const insets = useSafeAreaInsets(); 
 
   const handleAccept = () => {
     if (!checked || isAccepting) return;
@@ -26,69 +33,78 @@ export function KvkkModal({ visible, onAccept, isAccepting }: Props) {
   };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={false}
-      statusBarTranslucent
-      presentationStyle="fullScreen"
-      onRequestClose={() => {}}
-    >
+    <Modal visible={visible} animationType="slide" presentationStyle="fullScreen">
       <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.content}>
+        <ScrollView 
+          contentContainerStyle={[
+            styles.content,
+            { paddingTop: insets.top + 20 }
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.header}>
-            <Ionicons name="shield-checkmark" size={48} color="#E4D2AC" />
-            <Text style={styles.title}>Gizlilik ve Kişisel Verilerin Korunması</Text>
+            <View style={styles.iconCircle}>
+              <Ionicons name="shield-checkmark" size={isSmallDevice ? 42 : 48} color="#E4D2AC" />
+            </View>
+            <Text style={styles.title}>KVKK ve Gizlilik Bilgilendirmesi</Text>
           </View>
 
-          <Text style={styles.text}>
-            Bu uygulama, tek bir berber/kuaför işletmesine özel olarak randevu
-            hizmetlerinin sunulabilmesi ve kullanıcı hesabının oluşturulup
-            yönetilebilmesi amacıyla kişisel verilerinizi işlemektedir.
-          </Text>
+          <View style={styles.textCard}>
+            <Text style={styles.text}>
+              Berber Randevum, birden fazla berber/kuaför işletmesinin kendi
+              müşterilerine randevu hizmeti sunabildiği SaaS tabanlı bir mobil
+              uygulamadır. Uygulama kapsamında kişisel verileriniz, yalnızca
+              randevu hizmetlerinin sunulabilmesi amacıyla işlenmektedir.
+            </Text>
 
-          <Text style={styles.text}>
-            Bu kapsamda; ad, soyad ve e-posta adresiniz zorunlu olarak, telefon
-            numarası ve profil fotoğrafı ise isteğe bağlı olarak işlenebilir.
-            Ayrıca randevu bilgileri ve randevu geçmişiniz sistem tarafından
-            kaydedilir.
-          </Text>
+            <Text style={styles.text}>
+              Bu kapsamda; ad, soyad ve e-posta adresiniz zorunlu olarak; telefon
+              numarası ve profil fotoğrafı ise tamamen isteğe bağlı olarak
+              işlenebilir. Telefon numarası, yalnızca kullanıcı ile işletmenin
+              iletişim kurabilmesi amacıyla kullanılır.
+            </Text>
 
-          <Text style={styles.text}>
-            Bildirim gönderimi ve fotoğraf erişimi yalnızca sizin açık izninizle
-            aktif hale gelir. İzin vermemeniz durumunda uygulamanın temel
-            işlevleri kullanılmaya devam edilebilir.
-          </Text>
+            <Text style={styles.text}>
+              Profil, işletme ve hizmet görselleri güvenli bulut altyapısı
+              üzerinden saklanmaktadır. Randevu bildirimleri yalnızca randevu
+              oluşturma, iptal veya durum değişiklikleri için gönderilir.
+            </Text>
 
-          <Text style={styles.text}>
-            Kişisel verileriniz yalnızca randevu hizmetinin sunulması amacıyla
-            kullanılır, üçüncü kişilerle paylaşılmaz ve yetkisiz erişime karşı
-            gerekli teknik ve idari önlemler alınarak korunur.
-          </Text>
+            <Text style={styles.text}>
+              Kişisel verileriniz reklam veya pazarlama amacıyla kullanılmaz,
+              üçüncü kişilerle paylaşılmaz ve yetkisiz erişime karşı gerekli
+              teknik ve idari güvenlik önlemleri alınarak korunur.
+            </Text>
+          </View>
 
           <TouchableOpacity
             style={styles.linkContainer}
             onPress={() => setShowPolicy(true)}
+            activeOpacity={0.7}
           >
             <Text style={styles.link}>Gizlilik Politikası'nı görüntüle</Text>
-            <Ionicons name="chevron-forward" size={16} color="#E4D2AC" />
+            <Ionicons name="chevron-forward" size={18} color="#E4D2AC" />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.checkboxRow}
             onPress={() => setChecked(!checked)}
+            activeOpacity={0.8}
           >
             <View style={[styles.checkbox, checked && styles.checkboxChecked]}>
-              {checked && <Ionicons name="checkmark" size={14} color="#000" />}
+              {checked && <Ionicons name="checkmark" size={16} color="#1a1a1a" />}
             </View>
             <Text style={styles.checkboxText}>
-              Gizlilik Politikası’nı okudum ve kişisel verilerimin belirtilen
+              Gizlilik Politikası'nı okudum ve kişisel verilerimin belirtilen
               amaçlar doğrultusunda işlenmesini kabul ediyorum.
             </Text>
           </TouchableOpacity>
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View style={[
+          styles.footer,
+          { paddingBottom: Math.max(insets.bottom, 20) }
+        ]}>
           <TouchableOpacity
             disabled={!checked || isAccepting}
             style={[
@@ -99,110 +115,93 @@ export function KvkkModal({ visible, onAccept, isAccepting }: Props) {
             activeOpacity={0.8}
           >
             {isAccepting ? (
-              <ActivityIndicator color="#000" />
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator color="#1a1a1a" size="small" />
+                <Text style={styles.loadingText}>İşleniyor...</Text>
+              </View>
             ) : (
-              <>
-                <Ionicons name="checkmark-circle" size={20} color="#000" />
+              <View style={styles.buttonContent}>
+                <Ionicons name="checkmark-circle" size={24} color="#1a1a1a" />
                 <Text style={styles.buttonText}>Kabul Et ve Devam Et</Text>
-              </>
+              </View>
             )}
           </TouchableOpacity>
         </View>
       </View>
 
-      <Modal
-        visible={showPolicy}
-        animationType="slide"
-        transparent={false}
-        statusBarTranslucent
-        presentationStyle="fullScreen"
-        onRequestClose={() => setShowPolicy(false)}
-      >
+      {/* GİZLİLİK POLİTİKASI */}
+      <Modal visible={showPolicy} animationType="slide" presentationStyle="fullScreen">
         <View style={styles.container}>
-          <View style={styles.policyHeader}>
-            <TouchableOpacity onPress={() => setShowPolicy(false)}>
-              <Ionicons name="chevron-back" size={24} color="#E4D2AC" />
+          <View style={[
+            styles.policyHeader,
+            { paddingTop: insets.top + 16 } 
+          ]}>
+            <TouchableOpacity 
+              onPress={() => setShowPolicy(false)}
+              style={styles.backButton}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="chevron-back" size={28} color="#E4D2AC" />
             </TouchableOpacity>
             <Text style={styles.policyTitle}>Gizlilik Politikası</Text>
-            <View style={{ width: 24 }} />
+            <View style={{ width: 28 }} />
           </View>
 
-          <ScrollView contentContainerStyle={styles.content}>
-            <Text style={styles.text}>Son güncelleme: Ocak 2026</Text>
+          <ScrollView 
+            contentContainerStyle={[
+              styles.policyContent,
+              { paddingBottom: Math.max(insets.bottom, 20) + 20 }
+            ]}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.policyCard}>
+              <Text style={styles.text}>Son güncelleme: Ocak 2026</Text>
 
-            <Text style={styles.text}>
-              Bu Gizlilik Politikası, Berber Randevum mobil uygulamasını kullanan
-              kullanıcıların kişisel verilerinin nasıl toplandığını,
-              işlendiğini ve korunduğunu açıklamaktadır.
-            </Text>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>1. Toplanan Kişisel Veriler</Text>
+                <Text style={styles.text}>• Ad ve soyad</Text>
+                <Text style={styles.text}>• E-posta adresi</Text>
+                <Text style={styles.text}>• Telefon numarası (isteğe bağlı)</Text>
+                <Text style={styles.text}>• Profil fotoğrafı (isteğe bağlı)</Text>
+                <Text style={styles.text}>• Randevu bilgileri ve randevu geçmişi</Text>
+              </View>
 
-            <Text style={styles.sectionTitle}>1. Toplanan Kişisel Veriler</Text>
-            <Text style={styles.text}>Ad ve soyad</Text>
-            <Text style={styles.text}>E-posta adresi</Text>
-            <Text style={styles.text}>Telefon numarası (isteğe bağlı)</Text>
-            <Text style={styles.text}>Profil fotoğrafı (isteğe bağlı)</Text>
-            <Text style={styles.text}>
-              Randevu bilgileri ve randevu geçmişi
-            </Text>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>2. İşlenme Amaçları</Text>
+                <Text style={styles.text}>
+                  Veriler, kullanıcı hesabının oluşturulması, randevu
+                  oluşturulması ve yönetilmesi, randevu bildirimlerinin
+                  gönderilmesi amacıyla işlenir.
+                </Text>
+              </View>
 
-            <Text style={styles.sectionTitle}>
-              2. Kişisel Verilerin İşlenme Amaçları
-            </Text>
-            <Text style={styles.text}>
-              Kullanıcı hesabının oluşturulması ve yönetilmesi
-            </Text>
-            <Text style={styles.text}>
-              Randevu oluşturma, görüntüleme ve yönetme işlemleri
-            </Text>
-            <Text style={styles.text}>
-              Randevularla ilgili bilgilendirme yapılması
-            </Text>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>3. Üçüncü Taraf Hizmetler</Text>
+                <Text style={styles.text}>
+                  • Cloudinary: Görsel barındırma hizmeti
+                </Text>
+                <Text style={styles.text}>
+                  • Expo Push / Firebase: Randevu bildirimleri
+                </Text>
+              </View>
 
-            <Text style={styles.sectionTitle}>
-              3. Bildirimler ve Cihaz İzinleri
-            </Text>
-            <Text style={styles.text}>
-              Bildirim izni: Randevu durumları ve bilgilendirmeler için kullanılır.
-            </Text>
-            <Text style={styles.text}>
-              Fotoğraf erişimi: Yalnızca profil fotoğrafı eklemek istenirse kullanılır.
-            </Text>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>4. Hesap Silme</Text>
+                <Text style={styles.text}>
+                  Kullanıcılar hesaplarını uygulama içerisinden kalıcı olarak
+                  silebilir. Hesap silindiğinde kişisel veriler silinir; geçmiş
+                  randevular sistem bütünlüğü amacıyla anonim hale getirilebilir.
+                </Text>
+              </View>
 
-            <Text style={styles.sectionTitle}>
-              4. Kişisel Verilerin Paylaşılması
-            </Text>
-            <Text style={styles.text}>
-              Kişisel veriler üçüncü kişilerle paylaşılmaz ve reklam veya
-              pazarlama amacıyla kullanılmaz.
-            </Text>
-
-            <Text style={styles.sectionTitle}>5. Veri Güvenliği</Text>
-            <Text style={styles.text}>
-              Kişisel verilerinizin güvenliği için gerekli teknik ve idari
-              tedbirler alınmaktadır.
-            </Text>
-
-            <Text style={styles.sectionTitle}>6. Veri Saklama Süresi</Text>
-            <Text style={styles.text}>
-              Kişisel veriler hizmetin sunulması süresince saklanır. Hesap
-              silindiğinde, yasal yükümlülükler saklı kalmak kaydıyla silinir veya
-              anonim hale getirilir.
-            </Text>
-
-            <Text style={styles.sectionTitle}>
-              7. Kullanıcı Hakları ve Hesap Silme
-            </Text>
-            <Text style={styles.text}>
-              Kullanıcılar hesaplarını uygulama içerisinden kalıcı olarak
-              silebilir. Hesap silindiğinde kişisel veriler silinir ve ileri
-              tarihli randevular iptal edilir.
-            </Text>
-
-            <Text style={styles.sectionTitle}>8. Değişiklikler</Text>
-            <Text style={styles.text}>
-              Bu Gizlilik Politikası gerektiğinde güncellenebilir ve uygulama
-              üzerinden duyurulur.
-            </Text>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>5. Kullanıcı Hakları</Text>
+                <Text style={styles.text}>
+                  Kullanıcılar kişisel verilerine erişme, güncelleme ve silme
+                  haklarına sahiptir.
+                </Text>
+              </View>
+            </View>
           </ScrollView>
         </View>
       </Modal>
@@ -213,116 +212,208 @@ export function KvkkModal({ visible, onAccept, isAccepting }: Props) {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: "#1a1a1a",
-    padding: 16
+    backgroundColor: "#0a0a0a",
   },
   content: { 
-    padding: 24,
-    paddingBottom: 100 
+    padding: 20,
+    paddingBottom: 140,
   },
-  header: {
-    alignItems: "center",
-    marginBottom: 24,
-    gap: 12
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#fff",
-    textAlign: "center",
-  },
-  text: {
-    color: "#ccc",
-    fontSize: 14,
-    marginBottom: 16,
-    lineHeight: 22,
-  },
-  linkContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
-    marginTop: 8,
+  header: { 
+    alignItems: "center", 
     marginBottom: 32,
+    gap: 16,
   },
-  link: {
-    color: "#E4D2AC",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  checkboxRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(173,140,87,0.1)",
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "rgba(173,140,87,0.3)",
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: "#E4D2AC",
-    marginRight: 12,
+  iconCircle: {
+    width: isSmallDevice ? 84 : 96,
+    height: isSmallDevice ? 84 : 96,
+    borderRadius: isSmallDevice ? 42 : 48,
+    backgroundColor: "rgba(228, 210, 172, 0.1)",
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "rgba(228, 210, 172, 0.3)",
   },
-  checkboxChecked: {
+  title: { 
+    fontSize: isSmallDevice ? 20 : 24, 
+    fontWeight: "700", 
+    color: "#fff", 
+    textAlign: "center",
+    letterSpacing: 0.3,
+    paddingHorizontal: 20,
+  },
+  textCard: {
+    backgroundColor: "#1a1a1a",
+    borderRadius: 16,
+    padding: isSmallDevice ? 16 : 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  text: { 
+    color: "#d0d0d0", 
+    fontSize: isSmallDevice ? 14 : 15, 
+    marginBottom: 16, 
+    lineHeight: isSmallDevice ? 22 : 24,
+  },
+  linkContainer: { 
+    flexDirection: "row", 
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    padding: 16,
+    backgroundColor: "rgba(228, 210, 172, 0.08)",
+    borderRadius: 12,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "rgba(228, 210, 172, 0.2)",
+  },
+  link: { 
+    color: "#E4D2AC", 
+    fontWeight: "600",
+    fontSize: isSmallDevice ? 14 : 15,
+  },
+  checkboxRow: { 
+    flexDirection: "row", 
+    padding: isSmallDevice ? 16 : 20,
+    backgroundColor: "#1a1a1a",
+    borderRadius: 16,
+    alignItems: "flex-start",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  checkbox: { 
+    width: 28, 
+    height: 28, 
+    borderWidth: 2,
+    borderColor: "rgba(228, 210, 172, 0.4)",
+    marginRight: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
+    flexShrink: 0,
+  },
+  checkboxChecked: { 
     backgroundColor: "#E4D2AC",
+    borderColor: "#E4D2AC",
   },
-  checkboxText: {
-    color: "#fff",
+  checkboxText: { 
+    color: "#e0e0e0", 
     flex: 1,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: isSmallDevice ? 13 : 14,
+    lineHeight: isSmallDevice ? 20 : 22,
   },
-  footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
+  footer: { 
+    position: "absolute", 
+    bottom: 0, 
+    left: 0, 
     right: 0,
     padding: 20,
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#0a0a0a",
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.1)",
+    borderTopColor: "rgba(228, 210, 172, 0.2)",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: -4 },
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   },
-  button: {
+  button: { 
     flexDirection: "row",
-    gap: 8,
-    backgroundColor: "#E4D2AC",
-    padding: 16,
-    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+    padding: 18,
+    borderRadius: 16,
+    backgroundColor: "#E4D2AC",
+    minHeight: 56,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#E4D2AC",
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
-  buttonDisabled: {
-    opacity: 0.4,
+  buttonDisabled: { 
+    opacity: 0.5,
+    ...Platform.select({
+      ios: {
+        shadowOpacity: 0,
+      },
+      android: {
+        elevation: 0,
+      },
+    }),
   },
-  buttonText: {
-    color: "#000",
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  buttonText: { 
     fontWeight: "700",
     fontSize: 16,
+    color: "#1a1a1a",
+    letterSpacing: 0.3,
   },
-  policyHeader: {
-    paddingTop: 56,
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  loadingText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1a1a1a",
+  },
+  policyHeader: { 
+    paddingBottom: 16,
     paddingHorizontal: 20,
-    paddingBottom: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#1a1a1a",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.08)",
+    backgroundColor: "#0a0a0a",
   },
-  policyTitle: {
+  backButton: {
+    padding: 4,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: "center",
+  },
+  policyTitle: { 
+    fontSize: isSmallDevice ? 18 : 20, 
+    fontWeight: "700", 
     color: "#fff",
-    fontSize: 18,
-    fontWeight: "700",
   },
-  sectionTitle: {
-    color: "#E4D2AC",
-    fontSize: 16,
+  policyContent: {
+    padding: 20,
+  },
+  policyCard: {
+    backgroundColor: "#1a1a1a",
+    borderRadius: 16,
+    padding: isSmallDevice ? 16 : 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  section: {
+    marginTop: 24,
+  },
+  sectionTitle: { 
+    color: "#E4D2AC", 
+    fontSize: isSmallDevice ? 16 : 17, 
     fontWeight: "700",
-    marginTop: 8,
+    marginBottom: 12,
   },
 });

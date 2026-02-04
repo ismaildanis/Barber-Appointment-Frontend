@@ -9,25 +9,15 @@ const formatTRPhone = (phone?: string) => {
 
 type BarberListProps = {
   barbers: Barber[];
-  loading?: boolean;
   selectedId?: number | null;
   onSelect?: (id: number) => void;
 };
 
 export default function BarberList({
   barbers,
-  loading = false,
   selectedId,
   onSelect,
 }: BarberListProps) {
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.sectionTitle}>Berberlerimiz</Text>
-        <Spinner size="small" />
-      </View>
-    );
-  }
 
   if (!barbers || barbers.length === 0) {
     return (

@@ -46,7 +46,6 @@ export default function SelectShopModal({
                             end={{ x: 1, y: 1 }}
                             style={styles.gradientWrapper}
                         >
-                            {/* Header */}
                             <View style={styles.header}>
                                 <Text style={styles.title}>{title}</Text>
                                 <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -54,7 +53,6 @@ export default function SelectShopModal({
                                 </TouchableOpacity>
                             </View>
 
-                            {/* Shop List */}
                             <ScrollView 
                                 style={styles.scrollView}
                                 contentContainerStyle={styles.scrollContent}
@@ -81,7 +79,6 @@ export default function SelectShopModal({
                                                         end={{ x: 1, y: 0.5 }}
                                                         style={styles.shopItem}
                                                     >
-                                                        {/* Left: Shop Image */}
                                                         <View style={styles.shopImageWrapper}>
                                                             {shop.image ? (
                                                                 <Image
@@ -103,37 +100,25 @@ export default function SelectShopModal({
                                                             )}
                                                         </View>
 
-                                                        {/* Right: Shop Details */}
                                                         <View style={styles.rightSection}>
-                                                            {/* Shop Name */}
                                                             <Text style={styles.shopName} numberOfLines={1}>
                                                                 {shop.name}
                                                             </Text>
 
-                                                            {/* Location */}
                                                             <Text style={styles.locationText} numberOfLines={1}>
                                                                 {shop.district}, {shop.city}
                                                             </Text>
 
-                                                            {/* Full Address */}
                                                             <Text style={styles.addressText} numberOfLines={2}>
                                                                 {fullAddress}
                                                             </Text>
 
-                                                            {/* Phone */}
                                                             {shop.phone && (
                                                                 <Text style={styles.phoneText}>
                                                                     {shop.phone}
                                                                 </Text>
                                                             )}
-                                                        </View>
-
-                                                        {/* Selected Indicator */}
-                                                        {isSelected && (
-                                                            <View style={styles.selectedIndicator}>
-                                                                <Ionicons name="checkmark-circle" size={24} color="#D9C9A3" />
-                                                            </View>
-                                                        )}
+                                                        </View>                                       
                                                     </LinearGradient>
                                                 </BlurView>
                                             </View>

@@ -6,7 +6,7 @@ import { myColors } from "@/constants/theme";
 import { BlurView } from "expo-blur";
 
 
-type Props = { lastAppt?: Appointment | null; loading: boolean };
+type Props = { lastAppt?: Appointment | null; };
 
 const getInitials = (firstName?: string, lastName?: string) =>
   `${firstName?.[0] ?? "B"}${lastName?.[0] ?? ""}`.toUpperCase();
@@ -14,8 +14,7 @@ const getInitials = (firstName?: string, lastName?: string) =>
 const formatDate = (dateStr?: string) =>
   dateStr ? dateStr.replace("T", " ").slice(0, 16) : "";
 
-export default function LastAppointmentCard({ lastAppt, loading }: Props) {
-  if (loading) return <Spinner />;
+export default function LastAppointmentCard({ lastAppt }: Props) {
   if (!lastAppt) return null;
 
   const barberName = `${lastAppt.barber?.firstName ?? ""} ${lastAppt.barber?.lastName ?? ""}`.trim();

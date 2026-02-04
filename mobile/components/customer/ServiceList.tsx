@@ -8,7 +8,6 @@ import { Image } from "react-native";
 
 export type ServiceListProps = {
   services: Service[];
-  loading: boolean;
   autoPlay?: boolean;
 };
 
@@ -36,7 +35,7 @@ const ServiceCard = memo(({ item, cardWidth, cardHeight }: ServiceCardProps) => 
   </View>
 ));
 
-export default function ServiceList({ services, loading = false, autoPlay = true }: ServiceListProps) {
+export default function ServiceList({ services, autoPlay = true }: ServiceListProps) {
   const { width } = useWindowDimensions();
   const listRef = useRef<FlatList<Service>>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -85,15 +84,6 @@ export default function ServiceList({ services, loading = false, autoPlay = true
   );
 
   const keyExtractor = useCallback((item: Service) => String(item.id), []);
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.sectionTitle}>Servisler</Text>
-        <Spinner size="small" />
-      </View>
-    );
-  }
 
   if (!services?.length) {
     return (

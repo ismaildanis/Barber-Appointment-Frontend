@@ -20,6 +20,7 @@ import { useShopStore } from "@/src/store/useShopStore";
 export default function CustomerHome() {
   const router = useRouter();
   const { data: shops, isLoading: lLoading, refetch: refetchShops } = useGetShops();
+  const [refreshing, setRefreshing] = useState(false);
   const { activeShopSlug, setActiveShop } = useShopStore();
 
   useEffect(() => {
@@ -43,22 +44,35 @@ export default function CustomerHome() {
   const { data: lastAppt, isLoading: lastLoading, refetch: refetchLastAppt } = useGetCustomerLastAppointment();
   const { data: ScheduledAppt, isLoading: ScheduledLoading, refetch: refetchScheduledAppt } = useGetCustomerScheduledAppointment();
 
-  const loading = sLoading || bLoading || meLoading || lastLoading || ScheduledLoading || lLoading;
+  const isInitialLoading = sLoading || bLoading || meLoading || lastLoading || ScheduledLoading || lLoading ;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
   if (!me) return <Spinner />;
 
-  const onRefresh = () => {
-    refetchServices();
-    refetchBarbers();
-    refetchMe();
-    refetchLastAppt();
-    refetchScheduledAppt();
-    refetchShops();
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        refetchServices(),
+        refetchBarbers(),
+        refetchScheduledAppt(),
+        refetchLastAppt(),
+        refetchMe(),
+        refetchShops(),
+      ]);
+    } finally {
+      setRefreshing(false);
+    }
   };
-
+  if (isInitialLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Spinner />
+      </View>
+    );
+  }
   return (
     <View
       style={{ flex: 1, backgroundColor: myColors.mainBackground }}
@@ -72,18 +86,15 @@ export default function CustomerHome() {
           renderItem={() => null}
           contentContainerStyle={{ paddingBottom: 120 }}
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}
-          ListHeaderComponent={
-            loading ? (
-              <Spinner />
-            ) : (
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          ListHeaderComponent={( 
               <View style={styles.container}>
                 <TouchableOpacity onPress={() => router.push(`/(customer)/appointments/${ScheduledAppt?.id}`)}>
-                  <ScheduledAppointment scheduledAppt={ScheduledAppt} loading={lastLoading} />
+                  <ScheduledAppointment scheduledAppt={ScheduledAppt} />
                 </TouchableOpacity>
-                <LastAppointmentCard lastAppt={lastAppt} loading={lastLoading} />
-                <ServiceList services={services ?? []} loading={sLoading} />
-                <BarberList barbers={barbers ?? []} loading={bLoading} />
+                <LastAppointmentCard lastAppt={lastAppt} />
+                <ServiceList services={services ?? []} />
+                <BarberList barbers={barbers ?? []}/>
               </View>
             )
           }

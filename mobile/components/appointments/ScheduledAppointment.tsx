@@ -8,7 +8,6 @@ import { scheduledAppointmentColors } from "@/constants/theme/customerHome";
 
 type Props = { 
     scheduledAppt?: Appointment | null; 
-    loading: boolean;
 };
 
 const getInitials = (firstName?: string, lastName?: string) =>
@@ -17,8 +16,7 @@ const getInitials = (firstName?: string, lastName?: string) =>
 const formatDate = (dateStr?: string) =>
   dateStr ? dateStr.replace("T", " ").slice(0, 16) : "";
 
-export default function ScheduledAppointment({ scheduledAppt, loading }: Props) {
-  if (loading) return <Spinner />;
+export default function ScheduledAppointment({ scheduledAppt }: Props) {
   if (!scheduledAppt) return null;
 
   const barberName = `${scheduledAppt.barber?.firstName ?? ""} ${scheduledAppt.barber?.lastName ?? ""}`.trim();

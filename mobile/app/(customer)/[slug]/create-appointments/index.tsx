@@ -114,7 +114,6 @@ export default function CreateAppointments() {
   const selectedServices = services?.filter((s) => serviceIds.includes(s.id)) ?? [];
   const totalDuration = selectedServices.reduce((sum, s) => sum + (s.duration ?? 0), 0);
   const totalPrice = selectedServices.reduce((sum, s) => sum + parseFloat((s.price ?? 0)), 0);
-
   const selected = barbers?.find((b) => b.id === barberId);
   const others = barbers?.filter((b) => b.id !== barberId) ?? [];
   const display = [
@@ -122,6 +121,9 @@ export default function CreateAppointments() {
     ...others.slice(0, 1), 
   ];
   const remaining = others.length - 1;
+  const barberName = selected?.firstName ?? "Berber";
+  const barberLastName = selected?.lastName ?? "Bulunamadı";
+
   const onSelectDate = (date: string) => {
     setSelectedHour(undefined);
     setSelectedDate(date);
@@ -248,8 +250,8 @@ export default function CreateAppointments() {
             <View style={{ flexDirection: "row", justifyContent:"space-between", alignItems: "center", gap: 8, paddingHorizontal: 8 }}>
               <Text style={{ fontWeight: "700", fontSize: 28, color: "#fff" }}>Berber:</Text>
               <View style={{ flexDirection: "row", gap: 8 }}>
-                <Text style={{ fontWeight: "700", fontSize: 28, color: "#fff" }}>{`${selected?.firstName}`}</Text>
-                <Text style={{ fontWeight: "700", fontSize: 28, color: "#fff" }}>{`${selected?.lastName}`}</Text>
+                <Text style={{ fontWeight: "700", fontSize: 28, color: "#fff" }}>{barberName}</Text>
+                <Text style={{ fontWeight: "700", fontSize: 28, color: "#fff" }}>{`${barberLastName}`} </Text>
               </View>
             </View>
 
