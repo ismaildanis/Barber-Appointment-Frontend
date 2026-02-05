@@ -111,7 +111,6 @@ export default function Index() {
       const route = roleRoutes[user.role] || "/(customer)/home";
       router.replace(route);
     } else {
-      console.log("home");
       router.replace("/(customer)/home");
     }
   }, [nav?.key, canNavigate, user, isAuthenticated, router]);
