@@ -8,7 +8,8 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
-mobile/config.js 
+mobile/config.js
+
 # Native
 .kotlin/
 *.orig.*

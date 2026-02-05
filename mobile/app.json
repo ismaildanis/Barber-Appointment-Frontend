@@ -28,7 +28,7 @@
       }
     },
     "android": {
-      "package": "com.berberrandevum.mobile",
+      "package": "com.berberrandevum.app",
       "versionCode": 7,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {

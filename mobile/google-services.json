@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "50559397395",
-    "project_id": "berber-randevum-2e8e4",
-    "storage_bucket": "berber-randevum-2e8e4.firebasestorage.app"
+    "project_number": "441619252225",
+    "project_id": "berber-cef75",
+    "storage_bucket": "berber-cef75.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:50559397395:android:91c334fdc535470f8b99e6",
+        "mobilesdk_app_id": "1:441619252225:android:fa4badcf95a07380316c00",
         "android_client_info": {
-          "package_name": "com.berberrandevum.mobile"
+          "package_name": "com.berberrandevum.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAc7awiqONzq5YoOTuWQFpeuAcd3m3gvnY"
+          "current_key": "AIzaSyBlvzqxAWwj4XEapIPge6j9HyQNpgFv7zU"
         }
       ],
       "services": {
