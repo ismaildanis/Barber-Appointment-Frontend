@@ -52,7 +52,7 @@ export function KvkkModal({ visible, onAccept, isAccepting }: Props) {
           <View style={styles.textCard}>
             <Text style={styles.text}>
               Berber Randevum, birden fazla berber/kuaför işletmesinin kendi
-              müşterilerine randevu hizmeti sunabildiği SaaS tabanlı bir mobil
+              müşterilerine randevu hizmeti sunabildiği hizmet yazılımı tabanlı bir mobil
               uygulamadır. Uygulama kapsamında kişisel verileriniz, yalnızca
               randevu hizmetlerinin sunulabilmesi amacıyla işlenmektedir.
             </Text>

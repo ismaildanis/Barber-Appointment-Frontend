@@ -5,7 +5,7 @@ import { appointmentApi } from "../api/appointmentApi";
 const key = ["appointment"] as const;
 
 //Customer
-export const useGetCustomerAppointments = (range: AppointmentRange) => 
+export const useGetCustomerAppointments = (range: AppointmentRange, enabled: boolean = true) => 
     useQuery({
         queryKey: ['appointments', range],
         queryFn: () => appointmentApi.getCustomerAppointments(range),
@@ -13,6 +13,8 @@ export const useGetCustomerAppointments = (range: AppointmentRange) =>
         refetchOnMount: false,
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
+        enabled,
+        retry: false,
     })
 
 export const useGetCustomerOneAppointment = (id: number) => 
@@ -23,18 +25,22 @@ export const useGetCustomerOneAppointment = (id: number) =>
     })
 
 
-export const useGetCustomerLastAppointment = () =>
+export const useGetCustomerLastAppointment = (enabled: boolean = true) =>
     useQuery({
         queryKey: ["appointment", "last-completed"],
         queryFn: () => appointmentApi.getCustomerLastAppointment(),
         staleTime: 5 * 60 * 1000,
+        enabled,
+        retry: false,
     });
 
-export const useGetCustomerScheduledAppointment = () =>
+export const useGetCustomerScheduledAppointment = (enabled: boolean = true) =>
     useQuery({
         queryKey: ["appointment", "last-scheduled"],
         queryFn: () => appointmentApi.getCustomerScheduledAppointment(),
         staleTime: 5 * 60 * 1000,
+        enabled,
+        retry: false,
     });
 
 export const useCreateAppointment = () => {
@@ -75,6 +81,7 @@ export const useAvailableHoursForAppointment = (barberId?: number, date?: string
       return allHours.map((time: any) => ({ time, available: !busyHours.includes(time) }));
     },
     enabled: !!barberId && !!date,
+    retry: false,
   });
 
 
@@ -82,7 +89,8 @@ export const  useAvailableDatesForAppointment = () =>
     useQuery({
         queryKey: ["appointment", "available-dates"],
         queryFn: () => appointmentApi.availableDatesForAppointment(),
-        staleTime : 5 * 60 * 1000
+        staleTime : 5 * 60 * 1000,
+        retry: false,
     })
 
 

@@ -5,7 +5,7 @@ import BarberList from "@/components/customer/BarberList";
 import Spinner from "@/components/ui/Spinner";
 import { useGetServices } from "@/src/hooks/useServiceQuery";
 import { useGetBarbers } from "@/src/hooks/useBarberQuery";
-import { useUnifiedMe } from "@/src/hooks/useUnifiedAuth";
+import { useIsAuthenticated } from "@/src/hooks/useUnifiedAuth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import LastAppointmentCard from "@/components/appointments/LastAppointmentCard";
 import { useGetCustomerLastAppointment, useGetCustomerScheduledAppointment } from "@/src/hooks/useAppointmentQuery";
@@ -38,18 +38,17 @@ export default function CustomerHome() {
 
   const safeSlug = activeShopSlug ?? ""
 
+  const { isAuthenticated } = useIsAuthenticated();
   const { data: services, isLoading: sLoading, refetch: refetchServices } = useGetServices(safeSlug);
   const { data: barbers, isLoading: bLoading, refetch: refetchBarbers } = useGetBarbers(safeSlug);
-  const { data: me, isLoading: meLoading, refetch: refetchMe } = useUnifiedMe();
-  const { data: lastAppt, isLoading: lastLoading, refetch: refetchLastAppt } = useGetCustomerLastAppointment();
-  const { data: ScheduledAppt, isLoading: ScheduledLoading, refetch: refetchScheduledAppt } = useGetCustomerScheduledAppointment();
+  const { data: lastAppt, isLoading: lastLoading, refetch: refetchLastAppt } = useGetCustomerLastAppointment(isAuthenticated);
+  const { data: ScheduledAppt, isLoading: ScheduledLoading, refetch: refetchScheduledAppt } = useGetCustomerScheduledAppointment(isAuthenticated);
 
-  const isInitialLoading = sLoading || bLoading || meLoading || lastLoading || ScheduledLoading || lLoading ;
+  const isInitialLoading = sLoading || bLoading  || lastLoading || ScheduledLoading || lLoading ;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
-  if (!me) return <Spinner />;
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -59,20 +58,13 @@ export default function CustomerHome() {
         refetchBarbers(),
         refetchScheduledAppt(),
         refetchLastAppt(),
-        refetchMe(),
         refetchShops(),
       ]);
     } finally {
       setRefreshing(false);
     }
   };
-  if (isInitialLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Spinner />
-      </View>
-    );
-  }
+  
   return (
     <View
       style={{ flex: 1, backgroundColor: myColors.mainBackground }}
@@ -89,10 +81,14 @@ export default function CustomerHome() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListHeaderComponent={( 
               <View style={styles.container}>
-                <TouchableOpacity onPress={() => router.push(`/(customer)/appointments/${ScheduledAppt?.id}`)}>
-                  <ScheduledAppointment scheduledAppt={ScheduledAppt} />
-                </TouchableOpacity>
-                <LastAppointmentCard lastAppt={lastAppt} />
+                {isAuthenticated && (
+                  <>
+                    <TouchableOpacity onPress={() => router.push(`/(customer)/appointments/${ScheduledAppt?.id}`)}>
+                      <ScheduledAppointment scheduledAppt={ScheduledAppt} />
+                    </TouchableOpacity>
+                    <LastAppointmentCard lastAppt={lastAppt} />
+                  </>
+                )}
                 <ServiceList services={services ?? []} />
                 <BarberList barbers={barbers ?? []}/>
               </View>

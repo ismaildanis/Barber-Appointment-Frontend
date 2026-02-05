@@ -12,10 +12,11 @@ import { useServiceStore } from "@/src/store/serviceStore";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { RefreshControl, TouchableOpacity, ScrollView, Text, ImageBackground, Image, View, TextInput, useWindowDimensions } from "react-native";
+import { RefreshControl, TouchableOpacity, ScrollView, Text, ImageBackground, Image, View, TextInput, useWindowDimensions, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppointmentSummary from "@/components/appointments/AppointmentSummary";
 import { AlertModal } from "@/components/ui/AlertModal";
+import { useIsAuthenticated } from "@/src/hooks/useUnifiedAuth";
 import { useShopStore } from "@/src/store/useShopStore";
 
 type AlertMode = "confirm" | "info-success" | "info-error";
@@ -25,6 +26,7 @@ export default function CreateAppointments() {
   const { height } = useWindowDimensions();
   const { barberId, setBarberId } = useBarberStore();
   const { serviceIds, setServiceIds } = useServiceStore();
+  const { isAuthenticated } = useIsAuthenticated();
   
   const [selectedDate, setSelectedDate] = useState<string>();
   const [selectedHour, setSelectedHour] = useState<string>();
@@ -43,7 +45,7 @@ export default function CreateAppointments() {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMsg, setAlertMsg] = useState("");
   const [notes, setNotes] = useState<string>();
-  const loading = sLoading || bLoading  || adLoading || ahLoading; 
+  const loading = sLoading || bLoading || adLoading || ahLoading; 
 
   useEffect(() => {
     barbers?.forEach(b => Image.prefetch(b.image as string));
@@ -72,6 +74,17 @@ export default function CreateAppointments() {
   }
 
   const onClick = () => {
+    if (!isAuthenticated) {
+      Alert.alert(
+        "Giriş Gerekli",
+        "Randevu oluşturmak için lütfen giriş yapın.",
+        [
+          { text: "İptal", style: "cancel" },
+          { text: "Giriş Yap", onPress: () => router.push("/(auth)/login") },
+        ]
+      );
+      return;
+    }
     setAlertTitle("Uyarı");
     setAlertMsg("Randevu oluşturmak istediğinizden emin misiniz?");
     setAlertMode("confirm");
@@ -134,7 +147,6 @@ export default function CreateAppointments() {
   const hero = barbers?.find((b) => b.id === barberId)?.image;
   const heroSource = hero ? { uri: hero, cache: "force-cache" } : require("@/assets/images/default-service.png"); 
 
-  if (!availableDates) return <Spinner />;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#121212" }}>

@@ -24,7 +24,6 @@ export default function Dates({ dates, loading, selectedDate, onSelect }: DatesP
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.sectionTitle}>Günler</Text>
         <Spinner size="small" />
       </View>
     );

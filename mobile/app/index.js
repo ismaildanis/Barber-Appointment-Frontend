@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet } from "react-native";
 import { useRootNavigationState, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useUnifiedMe } from "@/src/hooks/useUnifiedAuth";
 import { LinearGradient } from "expo-linear-gradient";
 import { Asset } from "expo-asset";
+import { useIsAuthenticated } from "@/src/hooks/useUnifiedAuth";
 
 
 SplashScreen.preventAutoHideAsync();
@@ -22,9 +22,9 @@ const logoAsset = require("../assets/logo/adaptive-foreground.png");
 export default function Index() {
   const router = useRouter();
   const nav = useRootNavigationState();
-  const { data, isLoading, isError } = useUnifiedMe();
   const [canNavigate, setCanNavigate] = useState(false);
   const [splashHidden, setSplashHidden] = useState(false);
+  const { isAuthenticated, user } = useIsAuthenticated();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
@@ -97,22 +97,24 @@ export default function Index() {
 
   // Navigasyon yönlendirme
   useEffect(() => {
-    if (!nav?.key || isLoading || !canNavigate) return;
+    
+    if (!nav?.key || !canNavigate) return;
 
-    if (isError || !data) {
-      router.replace("/(auth)/login");
-      return;
+    if (isAuthenticated && user?.role) {
+      console.log("user.role", user.role);
+      const roleRoutes = {
+        customer: "/(customer)/home",
+        barber: "/(barber)/todayAppointments",
+        admin: "/(admin)/dashboard",
+      };
+
+      const route = roleRoutes[user.role] || "/(customer)/home";
+      router.replace(route);
+    } else {
+      console.log("home");
+      router.replace("/(customer)/home");
     }
-
-    const roleRoutes = {
-      customer: "/(customer)/home",
-      barber: "/(barber)/todayAppointments",
-      admin: "/(admin)/dashboard",
-    };
-
-    const route = roleRoutes[data.role] || "/(auth)/login";
-    router.replace(route);
-  }, [nav?.key, isLoading, isError, data?.role, canNavigate, router]);
+  }, [nav?.key, canNavigate, user, isAuthenticated, router]);
 
   return (
     <LinearGradient

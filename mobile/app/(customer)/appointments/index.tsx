@@ -7,13 +7,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FilterModal from "@/components/ui/FilterModal";
+import { useIsAuthenticated } from "@/src/hooks/useUnifiedAuth";
 
 export default function CustomerAppointments() {
   const [selectedRange, setSelectedRange] = useState<AppointmentRange>("today");
   const [isOpen, setIsOpen] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const { isAuthenticated } = useIsAuthenticated();
 
-  const { data, isLoading, isError, isRefetching, refetch } = useGetCustomerAppointments(selectedRange);
+  const { data, isLoading, isError, isRefetching, refetch } = useGetCustomerAppointments(selectedRange, isAuthenticated);
   const router = useRouter();
 
   const filterOptions = Object.entries(rangeLabels).map(([value, label]) => ({
@@ -54,6 +56,30 @@ export default function CustomerAppointments() {
             </Text>
           </View>
         </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Randevularım</Text>
+        <View style={styles.emptyContainer}>
+          <View style={styles.emptyIconContainer}>
+            <Ionicons name="lock-closed-outline" size={40} color="#E4D2AC" />
+          </View>
+          <Text style={styles.emptyTitle}>Giriş Yapın</Text>
+          <Text style={styles.emptyDescription}>
+            Randevularınızı görmek için lütfen giriş yapın.
+          </Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => router.push("/(auth)/login")}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.retryButtonText}>Giriş Yap</Text>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     );
   }

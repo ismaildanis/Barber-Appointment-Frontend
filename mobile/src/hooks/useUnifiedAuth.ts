@@ -30,7 +30,6 @@ export const useUnifiedMe = () => {
       });
     }
   }, [query.isError, query.error, router]);
-
   return query;
 };
 
@@ -122,6 +121,25 @@ export const useDeleteCustomer = () => {
             await queryClient.invalidateQueries({ queryKey: keyMe })
         }
     })
+}
+
+// Login kontrolü için hook (optional - 401 hatası vermez)
+export const useIsAuthenticated = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: keyMe,
+    queryFn: () => unifiedAuthApi.me(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+  
+  return {
+    isAuthenticated: !!data,
+    user: data,
+    isLoading,
+  };
 }
 
 

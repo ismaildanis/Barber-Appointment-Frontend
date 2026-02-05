@@ -24,7 +24,7 @@ export default function CustomerProfile() {
   const logout = useUnifiedLogout();
   const updateCustomer = useUpdateCustomer();
   const deleteCustomer = useDeleteCustomer();
-
+  console.log(data)
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

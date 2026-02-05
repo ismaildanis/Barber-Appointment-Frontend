@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Shop } from "@/src/types/shop";
@@ -8,6 +8,7 @@ import { useShopStore } from "@/src/store/useShopStore";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import SelectShopModal from "../shops/SelectShopModal";
+import { useIsAuthenticated } from "@/src/hooks/useUnifiedAuth";
 
 type ShopHeaderProps = {
   shops: Shop[] | undefined;
@@ -17,6 +18,7 @@ export default function ShopHeader({ shops }: ShopHeaderProps) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { activeShopSlug, setActiveShop } = useShopStore();
+  const { isAuthenticated } = useIsAuthenticated();
 
   
   const selectedShop = activeShopSlug 
@@ -73,12 +75,25 @@ export default function ShopHeader({ shops }: ShopHeaderProps) {
           </TouchableOpacity>
 
           {/* Profile Button */}
-          <TouchableOpacity 
-            onPress={() => router.push("/profile")}
-            style={styles.profileButton}
-          >
-            <Ionicons name="person" size={24} color="#E4D2AC" />
-          </TouchableOpacity>
+          {isAuthenticated ? (
+            <TouchableOpacity 
+              onPress={() => router.push("/profile")}
+              style={styles.profileButton}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="person" size={24} color="#E4D2AC" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity 
+              onPress={() => router.push("/(auth)/login")}
+              style={styles.loginButton}
+              activeOpacity={0.7}
+            >
+              <View style={styles.loginButtonContent}>
+                <Text style={styles.loginButtonText}>Giriş Yap</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -119,12 +134,17 @@ const styles = StyleSheet.create({
 
   shopSelector: {
     flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
     flexDirection: "row",
     gap: 12,
     alignItems: "center"
   },
 
   shopDisplay: {
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
@@ -152,6 +172,9 @@ const styles = StyleSheet.create({
   },
 
   shopTextContainer: {
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
     gap: 2,
   },
 
@@ -173,5 +196,28 @@ const styles = StyleSheet.create({
 
   profileButton: {
     padding: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    flexShrink: 0,
+  },
+  loginButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(228, 210, 172, 0.3)",
+    backgroundColor: "#121212",
+    flexShrink: 0,
+  },
+  loginButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  loginButtonText: {
+    color: "#E4D2AC",
+    fontSize: 14,
+    fontWeight: "600",
   },
 });
