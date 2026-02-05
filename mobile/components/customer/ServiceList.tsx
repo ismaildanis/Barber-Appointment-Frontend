@@ -1,14 +1,13 @@
 import { Service } from "@/src/types/service";
 import Spinner from "@/components/ui/Spinner";
-import { useCallback, useEffect, useRef, useState, memo } from "react";
-import { LinearGradient } from "expo-linear-gradient";
+import { useCallback, useEffect, useRef, memo } from "react";
 import { FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, useWindowDimensions, View } from "react-native";
-import { myColors } from "@/constants/theme";
 import { Image } from "react-native";
 
 export type ServiceListProps = {
   services: Service[];
   autoPlay?: boolean;
+  isLoading?: boolean;
 };
 
 type ServiceCardProps = {
@@ -35,7 +34,7 @@ const ServiceCard = memo(({ item, cardWidth, cardHeight }: ServiceCardProps) => 
   </View>
 ));
 
-export default function ServiceList({ services, autoPlay = true }: ServiceListProps) {
+export default function ServiceList({ services, autoPlay = true, isLoading }: ServiceListProps) {
   const { width } = useWindowDimensions();
   const listRef = useRef<FlatList<Service>>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -62,11 +61,6 @@ export default function ServiceList({ services, autoPlay = true }: ServiceListPr
     }, 3000);
   };
 
-  useEffect(() => {
-    startAutoPlay();
-    return stopAutoPlay;
-  }, [services, autoPlay]);
-
   const handleBeginDrag = () => stopAutoPlay();
   const handleEndDrag = () => startAutoPlay();
 
@@ -84,6 +78,14 @@ export default function ServiceList({ services, autoPlay = true }: ServiceListPr
   );
 
   const keyExtractor = useCallback((item: Service) => String(item.id), []);
+
+  useEffect(() => {
+    if (!services?.length || !autoPlay || isLoading ) return;
+    startAutoPlay();
+    return stopAutoPlay;
+  }, [services, autoPlay, isLoading]);
+
+  if (isLoading) return <Spinner />;
 
   if (!services?.length) {
     return (

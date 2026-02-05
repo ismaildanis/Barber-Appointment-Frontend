@@ -11,13 +11,23 @@ type BarberListProps = {
   barbers: Barber[];
   selectedId?: number | null;
   onSelect?: (id: number) => void;
+  isLoading?: boolean;
 };
 
 export default function BarberList({
   barbers,
   selectedId,
   onSelect,
+  isLoading,
 }: BarberListProps) {
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { alignItems: "center", justifyContent: "center", height: 120 }]}>
+        <Spinner />
+      </View>
+    );
+  }
 
   if (!barbers || barbers.length === 0) {
     return (

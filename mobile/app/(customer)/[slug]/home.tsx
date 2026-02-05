@@ -44,7 +44,6 @@ export default function CustomerHome() {
   const { data: lastAppt, isLoading: lastLoading, refetch: refetchLastAppt } = useGetCustomerLastAppointment(isAuthenticated);
   const { data: ScheduledAppt, isLoading: ScheduledLoading, refetch: refetchScheduledAppt } = useGetCustomerScheduledAppointment(isAuthenticated);
 
-  const isInitialLoading = sLoading || bLoading  || lastLoading || ScheduledLoading || lLoading ;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -89,8 +88,8 @@ export default function CustomerHome() {
                     <LastAppointmentCard lastAppt={lastAppt} />
                   </>
                 )}
-                <ServiceList services={services ?? []} />
-                <BarberList barbers={barbers ?? []}/>
+                <ServiceList services={services ?? []} isLoading={sLoading} />
+                <BarberList barbers={barbers ?? []} isLoading={bLoading} />
               </View>
             )
           }
