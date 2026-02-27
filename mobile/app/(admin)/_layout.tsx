@@ -101,6 +101,28 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         onPress={() => props.navigation.navigate("settings")}
       />
 
+      <DrawerItem
+        label="Kampanyalar"
+        icon={({ color, size }) => (
+          <Ionicons name="gift" color={color} size={size} />
+        )}
+        labelStyle={{ 
+          color: themeColors.textSecondary, 
+          fontWeight: "600",
+          fontSize: 15,
+        }}
+        style={{ 
+          marginHorizontal: 12, 
+          borderRadius: 12,
+          backgroundColor: themeColors.surface,
+          marginBottom: 8,
+        }}
+        inactiveTintColor={themeColors.textSecondary}
+        activeBackgroundColor={themeColors.primary}
+        activeTintColor={themeColors.textOnPrimary}
+        onPress={() => props.navigation.navigate("(tabs)", { screen: "campaigns" })}
+      />
+
       <View
         style={{
           height: 1,

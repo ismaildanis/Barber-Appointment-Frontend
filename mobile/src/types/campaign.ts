@@ -1,10 +1,13 @@
+import { CampaignService } from "./appointment";
+import { Service } from "./service";
+
 export interface Campaign {
     id: number;
     shopId: number;
     name: string;
     description?: string;
-    discountType: number;
-    discountValue: number;
+    discountType: number | string;
+    discountValue: number | string;
     startAt: string;
     endAt?: string | null;
     wheelEnabled: boolean;
@@ -14,10 +17,16 @@ export interface Campaign {
     updatedAt: string;
 }
 
+export interface CampaignForAdmin extends Campaign {
+    campaignServices: (CampaignService & { service?: Service })[];
+}
+
+export type DiscountType = "PERCENTAGE" | "FIXED_AMOUNT";
+
 export interface CreateCampaign {
     name: string;
     description?: string | null;
-    discountType: number;
+    discountType: DiscountType;
     discountValue: number;
     serviceIds: number[];
     startAt: string;
@@ -30,8 +39,9 @@ export interface CreateCampaign {
 export interface UpdateCampaign {
     name?: string;
     description?: string;
-    discountType?: number;
+    discountType?: DiscountType;
     discountValue?: number;
+    serviceIds?: number[];
     startAt?: string;
     endAt?: string | null;
     wheelEnabled?: boolean;

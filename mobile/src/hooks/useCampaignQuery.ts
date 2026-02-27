@@ -15,6 +15,19 @@ export const useGetCampaignsForShop = (slug: string) =>
     enabled: !!slug,
   });
 
+export const useGetCampaignForAdmin = () =>
+  useQuery({
+    queryKey: ["campaign", "admin"],
+    queryFn: () => campaignApi.getCampaignForAdmin(),
+  });
+
+export const useGetOneCampaignForAdmin = (id: number) =>
+  useQuery({
+    queryKey: ["campaign", "admin", id],
+    queryFn: () => campaignApi.getOneCampaignForAdmin(id),
+    enabled: !!id,
+  });
+
 export const useCreateCampaignMutation = () => {
   const queryClient = useQueryClient();
 
