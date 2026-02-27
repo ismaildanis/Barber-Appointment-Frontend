@@ -1,5 +1,5 @@
 import { authedApi as api } from "../api/unifiedAuthApi";
-import { Appointment, CreateAppointmentRequest, UpdateAppointmentRequest, CreateBreakForBarber, BarberAppointment, Status, AdminAppointment, GetBreaksForBarber, BarberCancel, AppointmentRange } from "../types/appointment";
+import { Appointment, CreateAppointmentRequest, UpdateAppointmentRequest, CreateBreakForBarber, BarberAppointment, Status, AdminAppointment, GetBreaksForBarber, BarberCancel, AppointmentRange, CampaignPreview, CampaignPreviewRequest } from "../types/appointment";
 
 export const appointmentApi = {
     //Customer 
@@ -12,6 +12,7 @@ export const appointmentApi = {
     cancelCustomerAppointment: async (id: number) => await api.put(`/appointment/cancel/${id}`).then(r => r.data),
     availableHoursForAppointment: async (barberId: number, date: string) => await api.get(`/appointment/available-hours/${barberId}`, { params: { date } }).then(r => r.data),
     availableDatesForAppointment: async () => await api.get(`/appointment/available-dates`).then(r => r.data),
+    campaignPreview: async (data: CampaignPreviewRequest) => await api.get<CampaignPreview>(`/appointment/preview`, { params: data }).then(r => r.data),
 
     //Barber
     getBarberAppointments: async (date: string) => await api.get<BarberAppointment[]>(`/appointment/barber`, { params: { date } }).then(r => r.data),

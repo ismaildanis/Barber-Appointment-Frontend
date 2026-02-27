@@ -67,6 +67,11 @@ export default function CustomerTabLayout () {
             />
 
             <Tabs.Screen
+              name="[slug]/rewards"
+              options={{ href: null }}
+            />
+
+            <Tabs.Screen
                 name="profile"
                 options={{ href: null }}
             />

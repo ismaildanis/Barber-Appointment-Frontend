@@ -1,3 +1,4 @@
+import { Campaign } from "./campaign";
 import { Customer } from "./customerAuth";
 import { WorkingHour } from "./workingHour";
 
@@ -86,6 +87,29 @@ export interface BarberAppointment {
     cancelledAt?: string | null;
     customer?: Customer | null;
     appointmentServices?: AppointmentService[] | null;
+}
+
+export interface CampaignPreviewRequest {
+    barberId: number;
+    serviceIds: number[];
+    appointmentStartAt: string;
+    rewardId: number;
+    shopSlug: string;
+}
+
+export interface CampaignPreview {
+    campaign: Campaign;
+    campaignServices: CampaignService[];
+    totalPrice: string;
+    newPrice: string;
+    totalDiscount: string;
+    totalDuration: number;
+}
+
+export interface CampaignService {
+    id: number;
+    campaignId: number;
+    serviceId: number;
 }
 
 export interface Barber {

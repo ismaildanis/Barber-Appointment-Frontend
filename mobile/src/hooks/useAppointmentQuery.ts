@@ -1,5 +1,5 @@
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Appointment, CreateAppointmentRequest, UpdateAppointmentRequest, CreateBreakForBarber, Status, BarberCancel, AppointmentRange } from "../types/appointment";
+import { Appointment, CreateAppointmentRequest, UpdateAppointmentRequest, CreateBreakForBarber, Status, BarberCancel, AppointmentRange, CampaignPreviewRequest } from "../types/appointment";
 import { appointmentApi } from "../api/appointmentApi";
 
 const key = ["appointment"] as const;
@@ -92,6 +92,17 @@ export const  useAvailableDatesForAppointment = () =>
         staleTime : 5 * 60 * 1000,
         retry: false,
     })
+
+export const useCampaignPreview = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CampaignPreviewRequest) => appointmentApi.campaignPreview(data),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: key })
+    },
+  })
+}
+
 
 
 //Barber

@@ -6,7 +6,7 @@ import Spinner from "@/components/ui/Spinner";
 import { useGetServices } from "@/src/hooks/useServiceQuery";
 import { useGetBarbers } from "@/src/hooks/useBarberQuery";
 import { useIsAuthenticated } from "@/src/hooks/useUnifiedAuth";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import LastAppointmentCard from "@/components/appointments/LastAppointmentCard";
 import { useGetCustomerLastAppointment, useGetCustomerScheduledAppointment } from "@/src/hooks/useAppointmentQuery";
 import { myColors } from "@/constants/theme";
@@ -15,6 +15,8 @@ import ScheduledAppointment from "@/components/appointments/ScheduledAppointment
 import { useRouter } from "expo-router";
 import { useGetShops } from "@/src/hooks/useShopQuery";
 import { useShopStore } from "@/src/store/useShopStore";
+import { Ionicons } from "@expo/vector-icons";
+import { WheelOfFortuneModal } from "@/components/customer/WheelOfFortuneModal";
 
 
 export default function CustomerHome() {
@@ -22,6 +24,8 @@ export default function CustomerHome() {
   const { data: shops, isLoading: lLoading, refetch: refetchShops } = useGetShops();
   const [refreshing, setRefreshing] = useState(false);
   const { activeShopSlug, setActiveShop } = useShopStore();
+  const [isWheelOpen, setIsWheelOpen] = useState(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (!activeShopSlug && shops && shops.length > 0) {
@@ -95,6 +99,30 @@ export default function CustomerHome() {
           }
         />
       </SafeAreaView>
+
+      {/* Floating wheel button */}
+      <View
+        style={[
+          styles.wheelButtonContainer,
+          {
+            bottom: Math.max(insets.bottom + 72, 32),
+          },
+        ]}
+      >
+        <TouchableOpacity
+          style={styles.wheelButton}
+          activeOpacity={0.85}
+          onPress={() => setIsWheelOpen(true)}
+        >
+          <Ionicons name="sparkles" size={22} color="#1A1A1A" />
+        </TouchableOpacity>
+      </View>
+
+      <WheelOfFortuneModal
+        visible={isWheelOpen}
+        onClose={() => setIsWheelOpen(false)}
+        shopSlug={activeShopSlug}
+      />
     </View>
   );
 }
@@ -105,5 +133,22 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 40,
     overflow: "hidden",
-  }
+  },
+  wheelButtonContainer: {
+    position: "absolute",
+    right: 20,
+  },
+  wheelButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#E4D2AC",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+  },
 });

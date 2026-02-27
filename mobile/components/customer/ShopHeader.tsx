@@ -74,15 +74,29 @@ export default function ShopHeader({ shops }: ShopHeaderProps) {
               </View>
           </TouchableOpacity>
 
-          {/* Profile Button */}
+          {/* Profile / Rewards Buttons */}
           {isAuthenticated ? (
-            <TouchableOpacity 
-              onPress={() => router.push("/profile")}
-              style={styles.profileButton}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="person" size={24} color="#E4D2AC" />
-            </TouchableOpacity>
+            <View style={styles.actions}>
+              <TouchableOpacity
+                onPress={() => {
+                  if (activeShopSlug) {
+                    router.push(`/(customer)/${activeShopSlug}/rewards`);
+                  }
+                }}
+                style={styles.iconButton}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="gift-outline" size={22} color="#E4D2AC" />
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                onPress={() => router.push("/profile")}
+                style={styles.iconButton}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="person" size={24} color="#E4D2AC" />
+              </TouchableOpacity>
+            </View>
           ) : (
             <TouchableOpacity 
               onPress={() => router.push("/(auth)/login")}
@@ -194,7 +208,12 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
 
-  profileButton: {
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  iconButton: {
     padding: 8,
     justifyContent: "center",
     alignItems: "center",
