@@ -91,7 +91,17 @@ export default function DashboardAppointmentDetail() {
   const date = appointment?.appointmentStartAt?.slice(0, 10);
   const start = appointment?.appointmentStartAt?.slice(11, 16).replace("T", " ");
   const end = appointment?.appointmentEndAt?.slice(11, 16).replace("T", " ");
-  const totalPrice = appointment?.appointmentServices?.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
+  const originalTotalPrice =
+    appointment?.appointmentServices?.reduce((sum, s) => sum + (Number(s.price) || 0), 0) || 0;
+  const discountedTotalPrice =
+    appointment?.appointmentServices?.reduce(
+      (sum, s) =>
+        sum +
+        (s.discountedPrice != null
+          ? Number(s.discountedPrice)
+          : Number(s.price) || 0),
+      0
+    ) || 0;
   const customer = appointment?.customer
     ? `${appointment.customer.firstName} ${appointment.customer.lastName}`
     : "Silinmiş Hesap";
@@ -177,7 +187,16 @@ export default function DashboardAppointmentDetail() {
               <View key={index} style={styles.serviceRow}>
                 <Text style={styles.serviceName}>{s?.name || "—"}</Text>
                 <View style={styles.serviceRight}>
-                  <Text style={styles.servicePrice}>₺{s?.price || "0"}</Text>
+                  <Text style={styles.servicePrice}>
+                    {s?.discountedPrice != null ? (
+                      <>
+                        <Text style={styles.servicePriceStrike}>₺{s?.price || "0"}</Text>{" "}
+                        ₺{s?.discountedPrice}
+                      </>
+                    ) : (
+                      <>₺{s?.price || "0"}</>
+                    )}
+                  </Text>
                   <Text style={styles.serviceDuration}>{s?.duration || "0"} dk</Text>
                 </View>
               </View>
@@ -185,9 +204,36 @@ export default function DashboardAppointmentDetail() {
 
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Toplam</Text>
-              <Text style={styles.totalPrice}>₺{totalPrice?.toFixed(2) || "0.00"}</Text>
+              <Text style={styles.totalPrice}>
+                {appointment?.reward ? (
+                  <>
+                    <Text style={styles.servicePriceStrike}>
+                      ₺{originalTotalPrice.toFixed(2)}
+                    </Text>{" "}
+                    ₺{discountedTotalPrice.toFixed(2)}
+                  </>
+                ) : (
+                  <>₺{originalTotalPrice.toFixed(2)}</>
+                )}
+              </Text>
             </View>
           </View>
+
+          {/* Reward / Campaign Card */}
+          {appointment?.reward && (
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Uygulanan Kampanya</Text>
+              <Text style={styles.serviceName}>
+                {appointment.reward.campaign?.name}
+              </Text>
+              <Text style={styles.value}>
+                İndirimsiz Fiyat: ₺{originalTotalPrice.toFixed(2)}
+              </Text>
+              <Text style={styles.value}>
+                İndirimli Fiyat: ₺{discountedTotalPrice.toFixed(2)}
+              </Text>
+            </View>
+          )}
 
           {/* Notes Card */}
           {appointment?.notes && (
@@ -394,6 +440,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: "#fff",
+  },
+  servicePriceStrike: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.6)",
+    textDecorationLine: "line-through",
   },
 
   serviceDuration: {

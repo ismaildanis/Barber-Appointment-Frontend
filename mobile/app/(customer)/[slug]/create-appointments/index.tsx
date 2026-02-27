@@ -4,7 +4,7 @@ import Space from "@/components/appointments/Space";
 import Spinner from "@/components/ui/Spinner";
 import { myColors } from "@/constants/theme";
 import { FontAwesome5  } from "@expo/vector-icons";
-import { useAvailableDatesForAppointment, useAvailableHoursForAppointment, useCreateAppointment } from "@/src/hooks/useAppointmentQuery";
+import { useAvailableDatesForAppointment, useAvailableHoursForAppointment, useCampaignPreview, useCreateAppointment } from "@/src/hooks/useAppointmentQuery";
 import { useGetBarbers } from "@/src/hooks/useBarberQuery";
 import { useGetServices } from "@/src/hooks/useServiceQuery";
 import { useBarberStore } from "@/src/store/barberStore";
@@ -18,6 +18,9 @@ import AppointmentSummary from "@/components/appointments/AppointmentSummary";
 import { AlertModal } from "@/components/ui/AlertModal";
 import { useIsAuthenticated } from "@/src/hooks/useUnifiedAuth";
 import { useShopStore } from "@/src/store/useShopStore";
+import { useGetAvailableRewardForCustomer, useGetRewardsForCustomer } from "@/src/hooks/useRewardQuery";
+import { Reward, RewardStatus } from "@/src/types/reward";
+import type { CampaignPreview, CampaignPreviewRequest } from "@/src/types/appointment";
 
 type AlertMode = "confirm" | "info-success" | "info-error";
 
@@ -39,13 +42,18 @@ export default function CreateAppointments() {
   const { data: availableDates, isLoading: adLoading, refetch: refetchAvailableDates } = useAvailableDatesForAppointment();
   const { data: availableHours, isLoading: ahLoading, refetch: refetchAvailableHours } = useAvailableHoursForAppointment(safeBarberId, selectedDate);
   const createAppointment = useCreateAppointment();
-
+  const campaignPreviewMutation = useCampaignPreview();
+  const [selectedRewardId, setSelectedRewardId] = useState<number | null>(null);
+  const { data: reward, isLoading: rLoading, refetch: refetchReward } = useGetAvailableRewardForCustomer(
+    activeShopSlug ?? ""
+  ); 
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMode, setAlertMode] = useState<AlertMode>("info-success");
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMsg, setAlertMsg] = useState("");
   const [notes, setNotes] = useState<string>();
   const loading = sLoading || bLoading || adLoading || ahLoading; 
+  const [preview, setPreview] = useState<CampaignPreview | null>(null);
 
   useEffect(() => {
     barbers?.forEach(b => Image.prefetch(b.image as string));
@@ -67,6 +75,57 @@ export default function CreateAppointments() {
       setBarberId(barbers[0].id)
     }
   }, [barbers, barberId]);
+
+  useEffect(() => {
+    if (
+      !activeShopSlug ||
+      !selectedRewardId ||
+      !barberId ||
+      !selectedDate ||
+      !selectedHour ||
+      !serviceIds.length
+    ) {
+      setPreview(null);
+      return;
+    }
+
+    const body: CampaignPreviewRequest = {
+      barberId,
+      serviceIds,
+      appointmentStartAt: `${selectedDate}T${selectedHour}`,
+      rewardId: selectedRewardId,
+      shopSlug: activeShopSlug,
+    };
+
+    campaignPreviewMutation
+      .mutateAsync(body)
+      .then((data) => setPreview(data))
+      .catch((err: any) => {
+        setPreview(null);
+        setSelectedRewardId(null);
+        const raw = err?.response?.data?.message ?? err?.message;
+        const msg =
+          typeof raw === "string" && raw.toLowerCase().includes("kampanya")
+            ? raw
+            : raw ||
+              "Ödül bu hizmetler için uygulanamadı. Lütfen kampanyanın geçerli olduğu hizmetleri seçtiğinizden emin olun.";
+        setAlertTitle("Kampanya uygulanamadı");
+        setAlertMsg(msg);
+        setAlertMode("info-error");
+        setAlertVisible(true);
+      });
+  }, [
+    activeShopSlug,
+    selectedRewardId,
+    barberId,
+    selectedDate,
+    selectedHour,
+    JSON.stringify(serviceIds),
+  ]);
+
+  const onSelectReward = (rewardId: number) => {
+    setSelectedRewardId((prev) => (prev === rewardId ? null : rewardId));
+  };
 
   const onSelect = () => {
     setSelectedHour(undefined);
@@ -96,6 +155,7 @@ export default function CreateAppointments() {
     createAppointment.mutate({ 
       barberId,
       serviceIds,
+      rewardId: selectedRewardId,
       notes,
       appointmentStartAt: `${selectedDate}T${selectedHour}`,
     }, {
@@ -146,6 +206,29 @@ export default function CreateAppointments() {
     
   const hero = barbers?.find((b) => b.id === barberId)?.image;
   const heroSource = hero ? { uri: hero, cache: "force-cache" } : require("@/assets/images/default-service.png"); 
+
+  const selectedReward: Reward | undefined =
+    reward ?? undefined;
+
+  const effectiveTotalPrice = preview
+    ? parseFloat(preview.newPrice)
+    : totalPrice;
+  const effectiveTotalDuration = preview
+    ? preview.totalDuration
+    : totalDuration;
+
+  const displayedServices =
+    preview?.discountedServicesPrices?.length
+      ? preview.discountedServicesPrices.map((s) => ({
+          name: s.name,
+          price: Number(s.price),
+          duration: s.duration,
+        }))
+      : selectedServices.map((s) => ({
+          name: s.name,
+          price: Number(s.price),
+          duration: s.duration,
+        }));
 
 
   return (
@@ -251,6 +334,7 @@ export default function CreateAppointments() {
                   refetchBarbers();
                   refetchAvailableDates();
                   refetchAvailableHours();
+                  refetchReward();
                 }}
               />
             }
@@ -306,7 +390,8 @@ export default function CreateAppointments() {
                 ) : (
                   <>
                     <Text style={{ color: "#1b1b1b", marginTop: 6 }}>
-                      {selectedServices.length} hizmet · {totalDuration} dk · {totalPrice} ₺
+                      {selectedServices.length} hizmet ·{" "}
+                      {effectiveTotalDuration} dk · {effectiveTotalPrice} ₺
                     </Text>
                     {selectedServices.slice(0, 3).map((s) => (
                       <Text key={s.id} style={{ color: "rgba(27,27,27,0.85)", marginTop: 4 }}>
@@ -322,6 +407,106 @@ export default function CreateAppointments() {
                 )}
               </LinearGradient>
             </TouchableOpacity>
+
+            {/* Ödülünü Kullan */}
+            {reward && (
+              <View
+                style={{
+                  marginTop: 18,
+                  borderRadius: 18,
+                  borderWidth: 1,
+                  borderColor:
+                    selectedRewardId === reward.id
+                      ? "#E4D2AC"
+                      : "rgba(228,210,172,0.35)",
+                  backgroundColor: "rgba(18,18,18,0.9)",
+                  padding: 14,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: 6,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "700",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    Ödülünü Kullan
+                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={() => onSelectReward(reward.id)}
+                    style={{
+                      paddingHorizontal: 10,
+                      paddingVertical: 4,
+                      borderRadius: 999,
+                      backgroundColor:
+                        selectedRewardId === reward.id
+                          ? "#E4D2AC"
+                          : "transparent",
+                      borderWidth: selectedRewardId === reward.id ? 0 : 1,
+                      borderColor: "rgba(228,210,172,0.5)",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color:
+                          selectedRewardId === reward.id ? "#121212" : "#E4D2AC",
+                        fontSize: 12,
+                        fontWeight: "700",
+                      }}
+                    >
+                      {selectedRewardId === reward.id ? "Seçili" : "Seç"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Text
+                  style={{
+                    color: "#E4D2AC",
+                    fontSize: 14,
+                    fontWeight: "600",
+                    marginBottom: 4,
+                  }}
+                  numberOfLines={2}
+                >
+                  {reward.campaign?.name}
+                </Text>
+                {reward.campaign?.description && (
+                  <Text
+                    style={{
+                      color: "#D0D0D0",
+                      fontSize: 12,
+                      marginBottom: 4,
+                    }}
+                    numberOfLines={3}
+                  >
+                    {reward.campaign.description}
+                  </Text>
+                )}
+                <Text
+                  style={{
+                    color: "#C0C0C0",
+                    fontSize: 11,
+                    marginTop: 2,
+                  }}
+                >
+                  Son kullanım:{" "}
+                  {new Date(reward.expiresAt).toLocaleDateString("tr-TR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })}
+                </Text>
+              </View>
+            )}
 
 
             <Hours
@@ -361,16 +546,20 @@ export default function CreateAppointments() {
                 />
               </View>
             )}
-          {selectedServices.length > 0 && selectedHour && barberId &&
+          {selectedServices.length > 0 && selectedHour && barberId && (
             <AppointmentSummary
               date={selectedDate}
               time={selectedHour}
               barberName={`${barbers?.find(b => b.id === barberId)?.firstName} ${barbers?.find(b => b.id === barberId)?.lastName}`}
-              services={selectedServices.map(s => ({ name: s.name, price: Number(s.price), duration: s.duration }))}
-              totalPrice={totalPrice}
-              totalDuration={totalDuration}
+              services={displayedServices}
+              totalPrice={effectiveTotalPrice}
+              totalDuration={effectiveTotalDuration}
+              appliedCampaignName={preview?.campaign.name}
+              originalTotalPrice={preview ? Number(preview.totalPrice) : undefined}
+              discountAmount={preview ? Number(preview.totalDiscount) : undefined}
+              discountedTotalPrice={preview ? Number(preview.newPrice) : undefined}
             />
-          }
+          )}
           {selectedServices.length > 0 && selectedHour && barberId &&
           <TouchableOpacity
             onPress={onClick}

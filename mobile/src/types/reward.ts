@@ -11,10 +11,7 @@ export interface Reward {
     expiresAt: string;
     createdAt: string;
     updatedAt: string;
-    // API denetiminden görüldüğü üzere alan adı `campaign` (küçük harf)
     campaign?: Campaign;
-    // Eski kullanım için bırakıldı, backend ilişki adını değiştirse de kırılmasın diye
-    Campaign?: Campaign;
 }
 
 export enum RewardStatus {

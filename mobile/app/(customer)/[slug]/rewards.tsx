@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -12,11 +12,11 @@ export default function RewardsScreen() {
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
 
-  const { data: rewards, isLoading } = useGetRewardsForCustomer(
+  const { data: rewards, isLoading, refetch } = useGetRewardsForCustomer(
     slug ?? "",
     RewardStatus.AVAILABLE
   );
-  
+
   const sortedRewards = useMemo(
     () =>
       (rewards ?? []).slice().sort((a, b) =>
@@ -69,7 +69,7 @@ type RewardCardProps = {
 
 const RewardCard = ({ reward }: RewardCardProps) => {
   const expires = new Date(reward.expiresAt);
-  const campaign = reward.campaign ?? reward.Campaign;
+  const campaign = reward.campaign;
   const campaignName = campaign?.name ?? "Kampanya";
   const campaignDescription = campaign?.description;
 

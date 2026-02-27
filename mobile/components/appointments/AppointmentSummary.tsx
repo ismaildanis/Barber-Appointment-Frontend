@@ -7,6 +7,10 @@ type SummaryProps = {
   services?: { name: string; price?: number; duration?: number }[];
   totalPrice?: number;
   totalDuration?: number;
+  appliedCampaignName?: string;
+  originalTotalPrice?: number;
+  discountAmount?: number;
+  discountedTotalPrice?: number;
 };
 
 export default function AppointmentSummary({
@@ -16,6 +20,10 @@ export default function AppointmentSummary({
   services = [],
   totalPrice,
   totalDuration,
+  appliedCampaignName,
+  originalTotalPrice,
+  discountAmount,
+  discountedTotalPrice,
 }: SummaryProps) {
     const formatDay = (date: string) => {
         const d = new Date(date);
@@ -37,6 +45,9 @@ export default function AppointmentSummary({
     };
 
     const endTime = getEndTime(time, services);
+    const formatMoney = (value?: number) =>
+        value != null ? value.toFixed(2) : "0.00";
+
     return (
         <View style={styles.container}>
         <Text style={styles.title}>Randevu Özeti</Text>
@@ -82,6 +93,28 @@ export default function AppointmentSummary({
             <Text style={styles.label}>Toplam Fiyat</Text>
             <Text style={styles.value}>{(totalPrice ?? 0)} ₺</Text>
         </View>
+
+        {appliedCampaignName && (
+          <>
+            <View style={[styles.divider, { marginTop: 8 }]} />
+            <Text style={[styles.label, { marginTop: 4 }]}>
+              Uygulanan Kampanya:{" "}
+              <Text style={styles.value}>{appliedCampaignName}</Text>
+            </Text>
+            <View style={styles.row}>
+              <Text style={styles.label}>İndirimsiz Fiyat</Text>
+              <Text style={styles.value}>{formatMoney(originalTotalPrice)} ₺</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Toplam İndirim</Text>
+              <Text style={styles.value}>-{formatMoney(discountAmount)} ₺</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Yeni Fiyat</Text>
+              <Text style={styles.value}>{formatMoney(discountedTotalPrice)} ₺</Text>
+            </View>
+          </>
+        )}
         </View>
     );
 }

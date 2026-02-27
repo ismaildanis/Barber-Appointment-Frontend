@@ -11,3 +11,11 @@ export const useGetRewardsForCustomer = (slug: string, status: RewardStatus) =>
         staleTime: 5 * 60 * 1000,
         enabled: !!slug,
     });
+
+export const useGetAvailableRewardForCustomer = (slug: string) =>
+    useQuery({
+        queryKey: [key, slug, "available"],
+        queryFn: () => rewardApi.getAvailableRewardForCustomer(slug),
+        staleTime: 5 * 60 * 1000,
+        enabled: !!slug,
+    });

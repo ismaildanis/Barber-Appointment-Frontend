@@ -179,6 +179,22 @@ export default function CustomerAppointments() {
               ?.map((s: AppointmentService) => s?.name)
               .join(", ") || "—";
 
+          const originalTotal =
+            item.appointmentServices?.reduce(
+              (sum, s) => sum + parseFloat(s.price),
+              0
+            ) || 0;
+          const discountedTotal =
+            item.appointmentServices?.reduce(
+              (sum, s) =>
+                sum +
+                parseFloat(
+                  s.discountedPrice != null ? s.discountedPrice : s.price
+                ),
+              0
+            ) || 0;
+          const hasReward = !!item.reward;
+
           return (
             <TouchableOpacity
               onPress={() =>
@@ -207,6 +223,19 @@ export default function CustomerAppointments() {
                 )}
                 <Text style={styles.meta}>İşletme: {item.shop?.name || "Bilinmiyor"}</Text>
                 <Text style={styles.meta}>Hizmetler: {services}</Text>
+                {hasReward && (
+                  <>
+                    <Text style={[styles.meta, { color: "#E4D2AC" }]}>
+                      Kampanya: {item.reward?.campaign?.name}
+                    </Text>
+                    <Text style={styles.meta}>
+                      Tutar: ₺{discountedTotal.toFixed(2)}{" "}
+                      <Text style={{ textDecorationLine: "line-through", opacity: 0.7 }}>
+                        ₺{originalTotal.toFixed(2)}
+                      </Text>
+                    </Text>
+                  </>
+                )}
                 {item.notes && <Text style={styles.note}>Not: {item.notes}</Text>}
               </View>
               <View style={styles.detailBadge}>

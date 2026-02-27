@@ -12,7 +12,7 @@ export const appointmentApi = {
     cancelCustomerAppointment: async (id: number) => await api.put(`/appointment/cancel/${id}`).then(r => r.data),
     availableHoursForAppointment: async (barberId: number, date: string) => await api.get(`/appointment/available-hours/${barberId}`, { params: { date } }).then(r => r.data),
     availableDatesForAppointment: async () => await api.get(`/appointment/available-dates`).then(r => r.data),
-    campaignPreview: async (data: CampaignPreviewRequest) => await api.get<CampaignPreview>(`/appointment/preview`, { params: data }).then(r => r.data),
+    campaignPreview: async (data: CampaignPreviewRequest) => await api.post<CampaignPreview>(`/appointment/preview`, data).then(r => r.data),
 
     //Barber
     getBarberAppointments: async (date: string) => await api.get<BarberAppointment[]>(`/appointment/barber`, { params: { date } }).then(r => r.data),
@@ -24,6 +24,7 @@ export const appointmentApi = {
     getBreaksForBarber: async () => await api.get<GetBreaksForBarber[]>(`/appointment/barber-break`).then(r => r.data),
     markCompletedBarber: async (id: number) => await api.post(`/appointment/barber-mark-completed/${id}`).then(r => r.data),
     markNoShowBarber: async (id: number) => await api.post(`/appointment/barber-mark-no-show/${id}`).then(r => r.data),
+    
     //Admin
     getAdminAppointments: async (status: Status, date: string) => await  api.get<AdminAppointment[]>("/appointment/admin", { params: { status,  ...(date && { date }) } }).then(r => r.data),
     getAdminOneAppointment: async (id: number) => await api.get<AdminAppointment>(`/appointment/admin/${id}`).then(r => r.data),
