@@ -17,7 +17,6 @@ destekler:
 - [API ve Ortam Degiskenleri](#api-ve-ortam-degiskenleri)
 - [Calistirma Komutlari](#calistirma-komutlari)
 - [Gelistirme Notlari](#gelistirme-notlari)
-- [Yaygin Problemler](#yaygin-problemler)
 - [Lisans](#lisans)
 
 ## Temel Ozellikler
@@ -140,21 +139,6 @@ npm run lint
 - UI tarafinda tema ve ortak component yaklasimi kullanilir.
 - Kritik akislarda (randevu, kampanya, wheel) backend validasyon mesaji
   kullaniciya modal/uyari ile yansitilir.
-
-## Yaygin Problemler
-
-### 1) Uygulama API'ye baglanamiyor
-- `EXPO_PUBLIC_API_URL` degeri bos veya yanlis olabilir.
-- Cihaz ve backend ayni agda olmayabilir.
-- Backend servisinin ayakta oldugunu kontrol edin.
-
-### 2) Android cihazda timeout
-- Local firewall istegi engelliyor olabilir.
-- `http://localhost` yerine `http://<LOCAL_IP>` kullanin.
-
-### 3) Login sonrasi sayfa yonlendirmesi beklenmiyor
-- Access/refresh token temizligi gerekebilir.
-- Uygulamayi kapatip acin veya depolanan tokenlari sifirlayin.
 
 ## Guvenlik ve Gizlilik
 
